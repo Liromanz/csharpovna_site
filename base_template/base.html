@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}CodeDocSS{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/navigation_style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base_style.css' %}"/>
+    {% block additional_css %}
+    {% endblock %}
+
+    <script type="text/JavaScript" src="{% static 'js/navigation_js.js' %}"></script>
+</head>
+<body class="default-body">
+<div class="wrapper">
+    <nav id="sidebar">
+        <ul class="list-unstyled components stick-to-top">
+            <p><b>C# - базовые структуры</b></p>
+            <li>
+                <a href="#baseSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Основы
+                    C#</a>
+                <ul class="collapse list-unstyled" id="baseSubmenu">
+                    <li><a href="{% url 'variables' %}">Переменные, ввод\вывод данных</a></li>
+                    <li><a href="{% url 'converters' %}">Конвертация</a></li>
+                    <li><a href="{% url 'datetime' %}">Работа с датами: Datetime</a></li>
+                    <li><a href="{% url 'var' %}">Var</a></li>
+                    <li><a href="{% url 'transformation' %}">Преобразование типов данных</a></li>
+                    <li><a href="{% url 'if' %}">Условия: if-else, switch-case</a></li>
+                    <li><a href="{% url 'cycles' %}">Циклы: while, for, do-while</a></li>
+                    <li><a href="{% url 'collections' %}">Коллекции: массив, лист, матрица. Цикл foreach</a></li>
+                    <li><a href="{% url 'trycatch' %}">Обработка ошибок: try-catch</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#simpleCodeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Упрощение
+                    кода</a>
+                <ul class="collapse list-unstyled" id="simpleCodeSubmenu">
+                    <li><a href="{% url 'linq' %}">LINQ запросы</a></li>
+                    <li><a href="#">Тернарные выражения - упрощение проверок</a></li>
+                    <li><a href="#">Регулярные выражения - Regex</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#consoleSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Работа с
+                    консолью</a>
+                <ul class="collapse list-unstyled" id="consoleSubmenu">
+                    <li><a href="#">Чтение символов с клавиатуры</a></li>
+                    <li><a href="#">Взаимодействие с консолью: расположение курсора, очистка</a></li>
+                    <li><a href="#">Пример стрелочного меню</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#classSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Классы</a>
+                <ul class="collapse list-unstyled" id="classSubmenu">
+                    <li><a href="#">Методы</a></li>
+                    <li><a href="#">Классы как свои типы данных</a></li>
+                    <li><a href="#">Модификаторы доступа</a></li>
+                    <li><a href="#">Инкапсуляция\сокрытие</a></li>
+                    <li><a href="#">Классы как контейнеры</a></li>
+                    <li><a href="#">Статичные классы</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#systemSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Работа с
+                    системой</a>
+                <ul class="collapse list-unstyled" id="systemSubmenu">
+                    <li><a href="#">Работа с файлами</a></li>
+                    <li><a href="#">Работа с JSON</a></li>
+                    <li><a href="#">Работа с XML</a></li>
+                    <li><a href="#">Папки: создание, чтение, удаление</a></li>
+                    <li><a href="#">Процессы: запуск, выключение</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#threadSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Многопоточночть</a>
+                <ul class="collapse list-unstyled" id="threadSubmenu">
+                    <li><a href="#">Потоки, Thread</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#oopSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">ООП</a>
+                <ul class="collapse list-unstyled" id="oopSubmenu">
+                    <li><a href="#">Наследование</a></li>
+                    <li><a href="#">Интерфейсы</a></li>
+                    <li><a href="#">Абстракции</a></li>
+                    <li><a href="#">Полиморфизм</a></li>
+                    <li><a href="#">Перечисляемые типы, enum</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#testSubmenu" data-toggle="collapse" aria-expanded="false"
+                   class="dropdown-toggle">Тестирование</a>
+                <ul class="collapse list-unstyled" id="testSubmenu">
+                    <li><a href="#">Unit-тесты, библиотека NUnit</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#moreSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Дополнительно</a>
+                <ul class="collapse list-unstyled" id="moreSubmenu">
+                    <li><a href="#">Generic-методы, тип данных T</a></li>
+                    <li><a href="#">Методы расширения, this</a></li>
+                </ul>
+            </li>
+            <p><b>C# - настольные приложения, WPF</b></p>
+        </ul>
+    </nav>
+
+
+    <div id="content">
+        <header class="p-3 bg-dark text-white stick-to-top">
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+
+                    <button type="button" id="sidebarCollapse" class="btn btn-success">
+                        <i class="fas fa-align-left"></i>
+                        <span>≡</span>
+                    </button>
+                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse"
+                            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fas fa-align-justify"></i>
+                    </button>
+
+                    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                        <li><a href="{% url 'mainpage' %}" class="nav-link px-2 text-white">Главная</a></li>
+                        <li><a href="#" class="nav-link px-2 text-white">C#</a></li>
+                    </ul>
+
+                    <div class="text-end">
+                        <a href="/" class="btn btn btn-success">Поддержать сайт</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <div class="content-arranger">
+            {% block content_description %}
+            {% endblock %}
+
+            {% block main_info %}
+                <h2>На этой странице пока ничего нет!</h2>
+                <p>Но гайды еще будут появляться, а пока, можете ознакомиться с другими статьями</p>
+
+                <div class="line"></div>
+
+                <button type="button" class="btn btn btn-success">Вернуться к главной</button>
+
+            {% endblock %}
+        </div>
+
+        <div class="row m-2">
+            <div class="col">
+                <a href="{% block previousPage %}#{% endblock %}" class="btn btn btn-success">К предыдущей статье</a>
+            </div>
+            <div class="col text-end">
+                <a href="{% block nextPage %}#{% endblock %}" class="btn btn btn-success">К следующей статье</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- jQuery CDN - Slim version (=without AJAX) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+        integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+        crossorigin="anonymous"></script>
+
+<script type="text/JavaScript" src="{% static 'js/navigation_js.js' %}"></script>
+
+{% block additional_js %}
+
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block main_info %}
+    <h2>Обработка ошибок: try-catch-finally</h2>
+
+    <p>Иногда наша программа выкидывает нам ошибку. После этих ошибок программа заканчивается, однако, мы хотим, чтобы
+        даже после критической ошибки, программа продолжила работу, только лишь оповестив пользователя о том, что что-то
+        не так. </p>
+    <img src="{% static 'img/charp/9_trycatch/1_dividebyzeroexception.png' %}" alt="Ошибка деления на ноль"/>
+    <p>Для решения этой проблемы можно было бы написать много условий, что в случае этой ошибки вывести это, в случае
+        другой ошибки – вывести это. Однако, что будет если ошибок будет 100 – писать 100 условий? </p>
+    <p>Как раз-таки для обработки ошибок существует конструкция try-catch-finally. </p>
+    <p>Try-catch позволяет нам выполнить какой-то код, который находится в блоке try. Если этот код выкинул ошибку,
+        тогда выполнение кода в try прервется мы перейдем в блок catch. Оттуда мы можем узнать, что именно за ошибка
+        произошла и, например, вывести ее в консоль. </p>
+    <div class="code-block">
+        <p class="code-text">try
+            {
+            &nbsp; &nbsp; int zero = 0
+            &nbsp; &nbsp; int a = 5 / zero;
+            }
+            catch (Exception ex)
+            {
+            &nbsp; &nbsp; Console. WriteLine(ex.Message);
+            }</p>
+    </div>
+    <p>Здесь мы видим, что после слова catch идут круглые скобки, где указана переменная ex типа данных Exception.
+        Exception – как раз таки ошибка, которую мы получаем. Если наша ошибка хранится в переменной ex, мы можем
+        сделать с ней что угодно – узнать источник, вывести сообщение ошибки, узнать последовательность действий,
+        которая привела к ошибке и прочее. В этом случае, я хочу вывести сообщение об ошибке, я выведу его с помощью
+        Message </p>
+    <p>Exception берет вообще любую ошибку, которая возникает у меня в коде. Если я хочу обработать какую-то
+        определенную ошибку, например, деление на ноль, тогда вместо Exception я могу написать тип данных ошибки – тот
+        же, что показывает нам Visual Studio </p>
+    <img src="{% static 'img/charp/9_trycatch/2_vserror.png' %}" alt="Ошибка в Visual Studio"/>
+    <img src="{% static 'img/charp/9_trycatch/3_exceptionincode.png' %}"
+         alt="Ошибка в catch, основываясь на ошибке из VS"/>
+    <p>Если я хочу обработать несколько разных частных ошибок, в которых будет разный код, я могу сделать несколько
+        блоков catch. Я немного видоизменю код, чтобы я смогла вводить делитель числа с помощью Console.ReadLine().
+        Тогда, у меня может появиться потенциальная ошибка – FormatException. Я добавлю еще один catch для этого </p>
+    <div class="code-block">
+        <p class="code-text">try
+            {
+            &nbsp; &nbsp; string zero = Console.ReadLine();
+            &nbsp; &nbsp; int a = 5 / Convert.ToInt32(zero);
+            }
+            catch (DivideByZeroException ex)
+            {
+            &nbsp; &nbsp; Console.WriteLine("Это ошибка деления на ноль");
+            &nbsp; &nbsp; Console.WriteLine(ex.Message);
+            }
+            catch (FormatException ex)
+            {
+            &nbsp; &nbsp; Console.WriteLine("Тут я ввела не число, a текст");
+            &nbsp; &nbsp; Console.WriteLine(ex.Message);
+            }</p>
+    </div>
+    <img src="{% static 'img/charp/9_trycatch/4_firstexception.png' %}" alt="Вывод ошибки с делением"/>
+    <img src="{% static 'img/charp/9_trycatch/5_secondexception.png' %}" alt="Вывод ошибки с форматом"/>
+
+    <p>Также есть необязательный блок finally. Если в конструкции try-catch есть блок finally, после выполнения try или
+        catch, код пойдет в этот блок, как завершающий этап выполнения обработки ошибок </p>
+    <p>Если кратко: </p>
+    <ul>
+        <li>Когда все хорошо, выполняется try-finaly</li>
+        <li>Когда все плохо, выполняется try-catch-finally</li>
+    </ul>
+    <p>Опять же, видоизменю код, чтобы у меня переменная с делителем существовала не только в try-catch, но и в принципе
+        в коде. Тогда в finally я смогу написать логику для повторного ввода переменной, так как finally выполняется
+        всегда</p>
+    <div class="code-block">
+        <p class="code-text">string zero = Console.ReadLine();
+
+            while (true)
+            {
+            &nbsp; &nbsp; try
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; int a = 5 / Convert.ToInt32(zero);
+            &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(a);
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; catch (DivideByZeroException ex)
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine("Это ошибка деления на ноль");
+            &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(ex.Message);
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; catch (FormatException ex)
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine("Тут я ввела не число, a текст");
+            &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(ex.Message);
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; finally
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine("--------------------------");
+            &nbsp; &nbsp; &nbsp; &nbsp; zero = Console.ReadLine();
+            &nbsp; &nbsp; }
+            }</p>
+    </div>
+    <img src="{% static 'img/charp/9_trycatch/6_allvariants.png' %}" alt="Все варианты ошибок и правильных выполнений"/>
+
+{% endblock %}
