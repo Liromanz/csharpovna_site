@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content_description %}
+    <h2>Содержание</h2>
+    <ul>
+        <li><a href="#clear" class="default-link">Очистка консоли</a></li>
+        <li><a href="#setcursorposition" class="default-link">Расположение курсора в консоли</a></li>
+        <li><a href="#color" class="default-link">Цвет консоли</a></li>
+        <li><a href="#additional" class="default-link">Дополнительные настройки</a></li>
+    </ul>
+
+{% endblock %}
+
+
+{% block previousPage %} {% url 'readkey' %} {% endblock %}
+{% block nextPage %} {% url 'ternar' %} {% endblock %}
+
+
+{% block main_info %}
+    <h2>Взаимодействие с консолью</h2>
+    <p>При работе с консолью вы могли заметить, что мы только и делаем, что вводим или выводим что-то на консоль.
+        Давайте расширим наш кругозор и посмотрим, как еще мы можем взаимодействовать с консолью</p>
+
+
+    <hr id="clear"/>
+    <h4>Очистка консоли</h4>
+    <p>Если у нас есть много лишней информации на экран, о которой мы уже хотим забыть (например, повторяющаяся менюка),
+        то всю эту информацию мы можем очистить с помощью следующего метода: </p>
+    <div class="code-block">
+        <p class="code-text">Console.Clear();</p>
+    </div>
+    <p>Все максимально просто, я хочу использовать консоль,<b> а именно,</b> очистить ее. Эту очистку мы также можем
+        поместить
+        в любое условие, цикл и прочее. При вызове этого метода очистится вся консоль </p>
+
+
+    <hr id="setcursorposition"/>
+    <h4>Расположение курсора в консоли</h4>
+    <p>Вывод нашего текста зависит от того, где находится курсор в консоли. По умолчанию, курсор находится на позиции
+        0,0, поэтому и текст выводится у нас с левого верхнего угла. А что, если я хочу вывести текст посередине? Для
+        этого есть следующий метод </p>
+    <div class="code-block">
+        <p class="code-text">Console.SetCursorPosition(слева, сверху);</p>
+    </div>
+    <p> Этим методом мы устанавливаем позицию курсора, откуда мы хотим что-то написать. Например, я хочу вывести
+        посередине экрана “Hello, world!”. Условно подгоняю, сколько символов мне нужно отступить от левого верхнего
+        края, а только потом пишу вывод </p>
+    <div class="code-block">
+        <p class="code-text">Console.SetCursorPosition(50, 10);
+            Console.WriteLine("Hello, World!");</p>
+    </div>
+    <img src="{% static 'img/charp/14_consoleuse/1_textpos.png' %}" alt="Позиция текста"/>
+    <p>Однако помните, что если мы будем писать что-то сразу же после этого текста, мы будем писать на строчку ниже с
+        начала строки, а не с той позиции, которую мы указали </p>
+    <img src="{% static 'img/charp/14_consoleuse/2_textposafter.png' %}"
+         alt="Позиция текста после расположенного текста"/>
+
+
+
+    <hr id="color"/>
+    <h4>Цвет консоли</h4>
+    <p>Что цвет текста, что цвет фона, можно менять. Для взаимодействия с цветом консоли существует два свойства и один
+        метод:</p>
+    <ul>
+        <li>
+            <b>ForegroundColor</b> - меняет цвет текста. Можно выбрать либо уже существующие цвета из ConsoleColor, либо
+            ввести собственные через RGB или HEX значения
+            <div class="code-block">
+                <p class="code-text">Console.ForegroundColor = ConsoleColor.White;</p>
+            </div>
+        </li>
+        <li>
+            <b>BackgroundColor</b> - меняет цвет фона. Выбор цвета аналогичен с текстом.
+            <div class="code-block">
+                <p class="code-text">Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    Console.WriteLine("Это текст!");</p>
+            </div>
+            Если я соединю обе строчки, а затем попробую вывести какой-то текст, к нему применятся эти настройки
+            <br/>
+            <img src="{% static 'img/charp/14_consoleuse/3_resultedcolor.png' %}" alt="Итоговый цвет"/>
+
+        </li>
+        <li>
+            <b>ResetColor()</b> - метод, возвращающие все цвета к базовым. Все изменения, которые были внесены до этого
+            после применения ResetColor будут сброшены
+            <div class="code-block">
+                <p class="code-text">Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    Console.WriteLine("Это текст!");
+
+                    Console.ResetColor();
+                    Console.WriteLine("Это текст!");</p>
+            </div>
+            <img src="{% static 'img/charp/14_consoleuse/4_resetresult.png' %}" alt="Сброс цвета"/>
+        </li>
+    </ul>
+
+
+
+    <hr id="additional"/>
+    <h4>Дополнительные настройки</h4>
+    <p>Из дополнительных настроек можно изменить титульник консоли, размер консоли и установить отображение курсора</p>
+    <ul>
+        <li>
+            <b>SetWindowSize(слева, снизу);</b> - размер экрана. Буферная зона (место, куда можно поместить значения в консоли)
+            при этом меняться не будет. Буферную зону также можно изменить, но только на Windows, через
+            <b>SetBufferSize(слева, снизу);</b>. Также, если вы делали цвет фона, то при изменении размера консоли фон будет
+            полностью перекрашен в цвет фона
+            <div class="code-block">
+                <p class="code-text">Console.SetWindowSize(100, 10);</p>
+            </div>
+        </li>
+        <li>
+            <b>Title</b> - титульник консоли. Туда можно поставить любой текст
+            <div class="code-block">
+                <p class="code-text">Console.Title = "Консолька!";</p>
+            </div>
+        </li>
+        <li>
+            <b>CursorVisible</b> - видимость мигающего курсора. True - чтобы было видно, false - не видно.
+            <div class="code-block">
+                <p class="code-text">Console.CursorVisible = false;</p>
+            </div>
+        </li>
+    </ul>
+{% endblock %}

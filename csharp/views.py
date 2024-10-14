@@ -53,3 +53,7 @@ def ternar(request):
 
 def readkey(request):
     return render(request, '13_readkey.html')
+
+
+def consoleuse(request):
+    return render(request, '14_consoleuse.html')
