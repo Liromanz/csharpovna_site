@@ -12,6 +12,12 @@
     </ul>
 
 {% endblock %}
+
+
+{% block previousPage %} {% url 'transformation' %} {% endblock %}
+{% block nextPage %} {% url 'cycles' %} {% endblock %}
+
+
 {% block main_info %}
     <h2 id="if">Условия</h2>
 

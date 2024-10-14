@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block previousPage %} {% url 'datetime' %} {% endblock %}
+{% block nextPage %} {% url 'transformation' %} {% endblock %}
+
+
 {% block main_info %}
     <h2>Var</h2>
     <p>

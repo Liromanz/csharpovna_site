@@ -10,6 +10,10 @@
     </ul>
 
 {% endblock %}
+
+{% block previousPage %} {% url 'variables' %} {% endblock %}
+{% block nextPage %} {% url 'datetime' %} {% endblock %}
+
 {% block main_info %}
     <h2 id="convert">Конвертация</h2>
 

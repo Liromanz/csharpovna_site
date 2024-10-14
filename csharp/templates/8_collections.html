@@ -13,6 +13,12 @@
     </ul>
 
 {% endblock %}
+
+
+{% block previousPage %} {% url 'cycles' %} {% endblock %}
+{% block nextPage %} {% url 'trycatch' %} {% endblock %}
+
+
 {% block main_info %}
     <h2>Коллекции: массив, лист, матрица. Цикл foreach</h2>
 

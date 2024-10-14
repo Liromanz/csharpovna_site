@@ -2,6 +2,10 @@
 {% load static %}
 
 
+{% block previousPage %} {% url 'collections' %} {% endblock %}
+{% block nextPage %} {% url 'linq' %} {% endblock %}
+
+
 {% block main_info %}
     <h2>Обработка ошибок: try-catch-finally</h2>
 

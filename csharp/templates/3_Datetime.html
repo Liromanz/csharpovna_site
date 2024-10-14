@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
+
+{% block previousPage %} {% url 'converters' %} {% endblock %}
+{% block nextPage %} {% url 'var' %} {% endblock %}
+
+
 {% block main_info %}
     <h2>Работа с датами - тип данных DateTime</h2>
 

@@ -9,6 +9,12 @@
     </ul>
 
 {% endblock %}
+
+
+{% block previousPage %} {% url 'var' %} {% endblock %}
+{% block nextPage %} {% url 'if' %} {% endblock %}
+
+
 {% block main_info %}
     <h2>Явное и неявное преобразование данных</h2>
     <p>

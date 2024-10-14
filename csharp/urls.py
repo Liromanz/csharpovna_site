@@ -14,4 +14,5 @@ urlpatterns = [
 
 
     path('linq', v.linq, name='linq'),
+    path('ternar', v.ternar, name='ternar'),
 ]

@@ -11,6 +11,12 @@
     </ul>
 
 {% endblock %}
+
+
+{% block previousPage %} {% url 'if' %} {% endblock %}
+{% block nextPage %} {% url 'collections' %} {% endblock %}
+
+
 {% block main_info %}
     <h2>Циклы: while, for, do..while</h2>
     <p>Цикл - процесс, составляющий кругооборот в течение известного промежутка времени. Кратко – повторяющийся блок

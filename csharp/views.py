@@ -43,3 +43,6 @@ def trycatch(request):
 
 def linq(request):
     return render(request, '10_linq.html')
+
+def ternar(request):
+    return render(request, '11_ternar.html')
