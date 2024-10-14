@@ -46,3 +46,10 @@ def linq(request):
 
 def ternar(request):
     return render(request, '11_ternar.html')
+
+
+# ------------------------------------------------------------------------ Работа с консолью
+
+
+def readkey(request):
+    return render(request, '13_readkey.html')
