@@ -17,8 +17,11 @@ urlpatterns = [
     path('ternar', v.ternar, name='ternar'),
     path('regex', v.regex, name='regex'),
 
+
     path('readkey', v.readkey, name='readkey'),
     path('consoleuse', v.consoleuse, name='consoleuse'),
     path('arrowmenu', v.arrowmenu, name='arrowmenu'),
 
+
+    path('methods', v.methods, name='methods'),
 ]

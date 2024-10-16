@@ -66,3 +66,10 @@ def consoleuse(request):
 
 def arrowmenu(request):
     return render(request, '15_arrowmenu.html')
+
+
+# ------------------------------------------------------------------------ Классы
+
+
+def methods(request):
+    return render(request, '16_methods.html')
