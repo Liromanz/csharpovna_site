@@ -57,3 +57,7 @@ def readkey(request):
 
 def consoleuse(request):
     return render(request, '14_consoleuse.html')
+
+
+def arrowmenu(request):
+    return render(request, '15_arrowmenu.html')
