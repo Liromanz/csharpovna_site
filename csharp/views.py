@@ -44,8 +44,13 @@ def trycatch(request):
 def linq(request):
     return render(request, '10_linq.html')
 
+
 def ternar(request):
     return render(request, '11_ternar.html')
+
+
+def regex(request):
+    return render(request, '12_regex.html')
 
 
 # ------------------------------------------------------------------------ Работа с консолью
