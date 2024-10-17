@@ -73,3 +73,7 @@ def arrowmenu(request):
 
 def methods(request):
     return render(request, '16_methods.html')
+
+
+def classasmodel(request):
+    return render(request, '17_classasmodel.html')
