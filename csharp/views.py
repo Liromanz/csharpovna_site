@@ -77,3 +77,11 @@ def methods(request):
 
 def classasmodel(request):
     return render(request, '17_classasmodel.html')
+
+
+def classascontainer(request):
+    return render(request, '18_classascontainer.html')
+
+
+def modifiers(request):
+    return render(request, '19_modifiers.html')

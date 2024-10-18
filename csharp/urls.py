@@ -25,4 +25,6 @@ urlpatterns = [
 
     path('methods', v.methods, name='methods'),
     path('classasmodel', v.classasmodel, name='classasmodel'),
+    path('classascontainer', v.classascontainer, name='classascontainer'),
+    path('modifiers', v.modifiers, name='modifiers'),
 ]
