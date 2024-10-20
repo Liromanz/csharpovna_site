@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block previousPage %} {% url 'modifiers' %} {% endblock %}
+{% block nextPage %} {% url 'modifiers' %} {% endblock %}
+
+
+{% block main_info %}
+    <h2>Статичные классы</h2>
+    <p>Мы начали изучать методы, зная, что они создаются как static void Название(), а потом, как только мы начали
+        изучать классы, слово static куда-то пропало. И можно было задастся вопросом, что такое static и зачем он
+        нужен? </p>
+    <p>Ключевое слово static показывает программе то, что этот объект нужно создать прямо в время запуска программы,
+        чтобы этим объектом можно было пользоваться в течении всей программы.
+        <b>По этой же причине метод Main статичный, так как он создается во время запуска программы.</b></p>
+    <p>Вот например, у меня есть класс – стрелочное меню из прошлой лекции </p>
+    <div class="code-block">
+        <p class="code-text">internal class Menu
+            {
+            &nbsp; &nbsp; private int minStrelochka;
+            &nbsp; &nbsp; private int maxStrelochka;
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public Menu(int min, int max)
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; minStrelochka = min;
+            &nbsp; &nbsp; &nbsp; &nbsp; maxStrelochka = max;
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public int Show()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; public int pos = 1;
+            &nbsp; &nbsp; &nbsp; &nbsp; ConsoleKeyInfo key;
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; do
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.SetCursorPosition(0, pos);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine("->");
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; key = Console.ReadKey();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.SetCursorPosition(0, pos);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine("");
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if (key.Key == ConsoleKey.UpArrow && pos != 1)
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pos--;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else if (key.Key == ConsoleKey DownArrow &S pos != 4)
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pos++;
+            &nbsp; &nbsp; &nbsp; &nbsp; } while (key.Key != Consolekey Enter);
+            &nbsp; &nbsp; &nbsp; &nbsp; return pos;
+            &nbsp; &nbsp; }
+            }
+        </p></div>
+    <p>Мы видим, что внутри него нет никаких static. Это значит, что чтобы использовать мой класс, я должна не просто
+        запустить код, а создать переменную с этим классом, и через него уже брать все методы\переменные внутри. </p>
+    <div class="code-block">
+        <p class="code-text"> Console.WriteLine("какой цвет вы любите?");
+            Console.WriteLine(" 1. красный");
+            Console.WriteLine(" 2. желтый");
+            Console.WriteLine(" 3. зеленый");
+            Console.WriteLine(" 4. синий");
+
+            Menu menu = new Menu(1, 4); // сейчас мы создаем переменную через экземпляр
+            int pos = menu.Show(); //а к методу обращаемся только тут
+
+            Console.Clear();
+            if (pos == 1)
+            &nbsp; &nbsp; Console.WriteLine("супер красный");</p>
+    </div>
+    <p>Я же хочу, чтобы этот класс можно было использовать _везде_ - во всех файлах, в любой части программы, чтобы у
+        меня была возможность сделать что-то настолько глобальное, что будет работать во всей программе. Либо, чтобы я
+        метод смогла вызывать как тот же Console.WriteLine(). Я же никогда не занималась тем, что создавала переменную
+        Console c = new Console(), а потом через c вызывала WriteLine(). Я просто писала Console.WriteLine(). Хочу
+        также! </p>
+    <p class="text-center">В этот момент и вступает ключевое слово <b>static</b></p>
+    <p>Видоизменю свой класс – добавлю static для метода, который я хочу использовать везде </p>
+    <img src="{% static 'img/charp/20_staticclass/1_staticvoid.png' %}" alt="Static в методе"/>
+    <p>Заметьте, что тогда нам надо удалить конструктор, потому что теперь мы ничего не передаем при <b>создании</b>,
+        создания больше нет. Видоизменю метод, чтобы минимальное и максимальное значение мы передавали сразу в метод
+    </p>
+    <div class="code-block">
+        <p class="code-text">internal class Menu
+            {
+            &nbsp; &nbsp; public static int Show(int minStrelochka, int maxStrelochka)
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; public int pos = 1;
+            &nbsp; &nbsp; &nbsp; &nbsp; ConsoleKeyInfo key;
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; do
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.SetCursorPosition(0, pos);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine("->");
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; key = Console.ReadKey();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.SetCursorPosition(0, pos);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine("");
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if (key.Key == ConsoleKey.UpArrow && pos != 1)
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pos--;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; else if (key.Key == ConsoleKey DownArrow &S pos != 4)
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; pos++;
+            &nbsp; &nbsp; &nbsp; &nbsp; } while (key.Key != Consolekey Enter);
+            &nbsp; &nbsp; &nbsp; &nbsp; return pos;
+            &nbsp; &nbsp; }
+            }
+        </p></div>
+    <p>Тогда, если метод стал статичным, я могу его использовать где угодно – в Program.cs, в других классах, и прочее,
+        просто написав названиекласса.объект. </p>
+    <img src="{% static 'img/charp/20_staticclass/2_change.png' %}" alt="Изменение обьявления меню"/>
+    <p>И тогда я смогу использовать свой статичный метод везде. Где нам может это понадобиться? </p>
+    <ul>
+        <li>Создать <b>мега глобальные</b> переменные – мы умеем создавать глобальные переменные для одного класса, а
+            если мы
+            хотим сделать глобальные переменные для всех классов, мы можем вынести их в отдельный класс и пометить
+            переменные ключевым словом static
+        </li>
+        <li>
+            Создать класс, логика которого не будет меняться в зависимости от того, что находится внутри. Например, свои
+            типы данных не должны быть статичными, так как они все разные, в зависимости от <b>переменной</b>, которую
+            мы создаем. Если бы та же пицца из статьи о своих типах данных была статичная, она была бы одна на весь мир.
+            Представьте, что на всех 8 миллиардов человек будет одна гавайская пицца! Конечно, она может меняться, может
+            быть неделя BBQ, но пицца все еще будет одна. Такого быть не должно, значит свои типы данных не могут быть
+            статичными
+
+            <div class="code-block">
+                <p class="code-text">internal class Pizza
+                    {
+                    &nbsp; &nbsp; public string Name;
+                    &nbsp; &nbsp; public string Nachinka;
+                    &nbsp; &nbsp; public int Price;
+                    }</p>
+            </div>
+            А вот стрелочное меню и должно быть «одним на весь мир» - его логика не меняется в течении программы, так
+            что оно может быть статичным
+        </li>
+    </ul>
+    <p>Явный пример статического класса – класс Console (Console.WriteLine(), Console.Beep() и прочее).</p>
+    <p>Явный пример обычного класса – свои типы данных, Pizza или Human (Pizza pizza = new Pizza()) например, из наших
+        предыдущих лекций</p>
+
+{% endblock %}

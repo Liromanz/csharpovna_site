@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block content_description %}
+    <h2>Содержание</h2>
+    <ul>
+        <li><a href="#creation" class="default-link">Создание класса и написание кода в нем</a></li>
+        <li><a href="#constructor" class="default-link">Передача данных в момент создания экземпляра - конструкторы </a>
+        </li>
+    </ul>
+
+{% endblock %}
+
+
+{% block previousPage %} {% url 'classasmodel' %} {% endblock %}
+{% block nextPage %} {% url 'modifiers' %} {% endblock %}
+
+
+{% block main_info %}
+    <h2>Модификаторы доступа, инкапсуляция\сокрытие</h2>
+
+{% endblock %}

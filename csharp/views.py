@@ -85,3 +85,8 @@ def classascontainer(request):
 
 def modifiers(request):
     return render(request, '19_modifiers.html')
+
+
+def staticclass(request):
+    return render(request, '20_staticclass.html')
+
