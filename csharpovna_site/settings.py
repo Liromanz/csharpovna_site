@@ -121,7 +121,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/" # Django will search for /static/
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"), # Django will search for /static/
+    os.path.join(BASE_DIR, "csharpovna_site/static"), # Django will search for /static/
 ]
 STATIC_ROOT = "static/" # Basic configuration when using manage.py collectstatic
 # Default primary key field type
