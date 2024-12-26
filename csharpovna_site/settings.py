@@ -119,11 +119,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "/static/" # Django will search for /static/
+STATIC_URL = '/static/' # Django will search for /static/
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "csharpovna_site/static"), # Django will search for /static/
 ]
-STATIC_ROOT = "static/" # Basic configuration when using manage.py collectstatic
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/') # Basic configuration when using manage.py collectstatic
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
