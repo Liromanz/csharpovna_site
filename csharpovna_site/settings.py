@@ -21,7 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = 'django-insecure-6z2f#i8-yu_(l0g9ec&211b*^b$__3*fdoenf12(g1l*0sij$o'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -79,8 +80,12 @@ WSGI_APPLICATION = 'csharpovna_site.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'codedocss_db',
+        'USER': 'sit3ch3lik',
+        'PASSWORD': 'R4b!OZu\\ec3{EN',
+        'HOST': '89.23.118.157',
+        'PORT': '5432',
     }
 }
 

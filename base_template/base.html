@@ -19,7 +19,8 @@
 <div class="wrapper">
     <nav id="sidebar">
         <ul class="list-unstyled components stick-to-top">
-            <p><b>C# - базовые структуры</b></p>
+            <h4 class="text-center">C# - базовые структуры</h4>
+            <hr/>
             <li>
                 <a href="#baseSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Основы
                     C#</a>
@@ -49,7 +50,8 @@
                     консолью</a>
                 <ul class="collapse list-unstyled" id="consoleSubmenu">
                     <li><a href="{% url 'readkey' %}">Чтение символов с клавиатуры</a></li>
-                    <li><a href="{% url 'consoleuse' %}">Взаимодействие с консолью: расположение курсора, очистка</a></li>
+                    <li><a href="{% url 'consoleuse' %}">Взаимодействие с консолью: расположение курсора, очистка</a>
+                    </li>
                     <li><a href="{% url 'arrowmenu' %}">Пример стрелочного меню</a></li>
                 </ul>
             </li>
@@ -113,18 +115,11 @@
             <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
 
-                    <button type="button" id="sidebarCollapse" class="btn btn-success">
-                        <i class="fas fa-align-left"></i>
-                        <span>≡</span>
-                    </button>
-                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse"
-                            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="fas fa-align-justify"></i>
-                    </button>
+                    <button type="button" id="sidebarCollapse" class="btn btn-success me-2">≡</button>
 
-                    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                    <ul class="nav col-auto me-md-auto justify-content-center mb-md-0">
                         <li><a href="{% url 'mainpage' %}" class="nav-link px-2 text-white">Главная</a></li>
+                        <li><a href="{% url 'devblog' %}" class="nav-link px-2 text-white">Dev-блог</a></li>
                         <li><a href="#" class="nav-link px-2 text-white">C#</a></li>
                     </ul>
 
@@ -151,12 +146,17 @@
         </div>
 
         <div class="row m-2">
-            <div class="col">
-                <a href="{% block previousPage %}#{% endblock %}" class="btn btn btn-success">К предыдущей статье</a>
-            </div>
-            <div class="col text-end">
-                <a href="{% block nextPage %}#{% endblock %}" class="btn btn btn-success">К следующей статье</a>
-            </div>
+            {% if show_previous_page %}
+                <div class="col">
+                    <a href="{% block previousPage %}#{% endblock %}" class="btn btn btn-success">К предыдущей
+                        статье</a>
+                </div>
+            {% endif %}
+            {% if show_next_page %}
+                <div class="col text-end">
+                    <a href="{% block nextPage %}#{% endblock %}" class="btn btn btn-success">К следующей статье</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

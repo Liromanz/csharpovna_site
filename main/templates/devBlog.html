@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main_info %}
+    <h2>Dev-блог - все новости и нововведения на сайте</h2>
+    <hr/>
+
+    {% for newsItem in object_list %}
+        <div class="card bg-dark">
+            <div class="card-header">
+                {{ newsItem.date|date:"j E Y" }}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ newsItem.title }}</h5>
+                <p class="card-text">{{ newsItem.content }}</p>
+            </div>
+            <div class="card-footer text-muted">
+                {% for tag in newsItem.tags.all %}
+                    <a href="#{{ tag }}" class="btn btn-success">{{ tag }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <br/>
+    {% endfor %}
+
+    {% if is_paginated %}
+        <br/>
+        <div class="row justify-content-md-center">
+            <div class="col-auto mx-auto">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-success"><<</a>
+                    <a href="?page=1" class="btn btn-outline-success">1</a>
+                    ..
+                {% endif %}
+
+                {% for page in paginator.page_range %}
+                    {% if page != paginator.num_pages and page != 1 %}
+                        <a href="?page={{ page }}" class="btn btn-outline-success">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    ..
+                    <a href="?page={{ paginator.num_pages }}"
+                       class="btn btn-outline-success">{{ paginator.num_pages }}</a>
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-success">>></a>
+                {% endif %}
+
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
