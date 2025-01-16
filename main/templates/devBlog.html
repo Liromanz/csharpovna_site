@@ -12,7 +12,7 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title">{{ newsItem.title }}</h5>
-                <p class="card-text">{{ newsItem.content }}</p>
+                <p class="card-text" style="white-space: pre-wrap">{{ newsItem.content }}</p>
             </div>
             <div class="card-footer text-muted">
                 {% for tag in newsItem.tags.all %}
