@@ -48,7 +48,7 @@
             &nbsp; &nbsp; Console.WriteLine("->");
             }</p>
     </div>
-    <img src="{% static 'img/charp/15_arrowmenu/1_arrowupdown.png' %}" alt="Перемещение стрелки"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/1_arrowupdown.png' %}" alt="Перемещение стрелки"/>
     <p>Принцип мы поняли – если мы идем вниз, число увеличивается, если вверх – уменьшается. Давайте вынесем второе
         число в отдельную переменную и будем ему прибавлять или убавлять значения в зависимости от того, на какую
         клавишу мы нажали. </p>
@@ -95,10 +95,10 @@
             Console.WriteLine("->");</p>
     </div>
     <p>Давайте обернем это чтение символа в бесконечный цикл и посмотрим, что у нас получится </p>
-    <img src="{% static 'img/charp/15_arrowmenu/2_manyarrows.png' %}" alt="Много стрелок"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/2_manyarrows.png' %}" alt="Много стрелок"/>
     <p>Стрелочки постоянно повторяются, я же хочу, чтобы была одна стрелочка на всё меню. Тогда я добавлю
         Console.Clear() перед тем, как рисовать новую стрелку </p>
-    <img src="{% static 'img/charp/15_arrowmenu/3_onearrow.png' %}" alt="Одна стрелка"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/3_onearrow.png' %}" alt="Одна стрелка"/>
     <p>Также, я могу добавить свое текстовое меню в отдельный метод, чтобы каждый раз вызывать его после очищения
         экрана. Чтобы выбрать какой-то элемент, нам нужно будет читать нажатие клавиши Enter, а выбранный пункт мы можем
         узнать из переменной position </p>
@@ -135,15 +135,15 @@
             }
         </p>
     </div>
-    <img src="{% static 'img/charp/15_arrowmenu/4_menuresult.png' %}" alt="Результат меню"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/4_menuresult.png' %}" alt="Результат меню"/>
     <p>Есть еще другой вариант, чтобы интерфейс не мелькал постоянно, когда мы переключаем стрелку. Можно чистить старую
         позицию стрелки. Тогда вместо Console.Clear(); мы сделаем иначе. </p>
     <p>Как только пользователь нажал клавишу, мы должны поставить два пробела там, где стрелка находится в данный
         момент. Так мы затираем уже нарисованную стрелку. Потом уже код смотрит, на какую стрелку мы нажали, меняет
         позицию и рисует стрелку заново</p>
-    <img src="{% static 'img/charp/15_arrowmenu/5_clearing.png' %}" alt="Затирка пробелом"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/5_clearing.png' %}" alt="Затирка пробелом"/>
     <p>Вот эти две строчки снизу тогда убираем, так как больше не нужно ничего дополнительно чистить </p>
-    <img src="{% static 'img/charp/15_arrowmenu/6_removing.png' %}" alt="Сброс цвета"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/6_removing.png' %}" alt="Сброс цвета"/>
     <p>Итоговый код для меню выглядит следующим образом</p>
     <div class="code-block">
         <p class="code-text">
@@ -189,21 +189,21 @@
     <h4>Выбор элемента по нажатию на enter </h4>
     <p>Для начала, по нажатию на enter наш цикл должен закончится. Значит вместо while true ставим условие – while
         key.Key != ConsoleKey.Enter. Но проблема в том, что key у нас создается на 2 строчки ниже </p>
-    <img src="{% static 'img/charp/15_arrowmenu/7_keyerror.png' %}" alt="Ошибка с key"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/7_keyerror.png' %}" alt="Ошибка с key"/>
     <p>Все, что нам нужно сделать, это переместить этот key выше, из цикла, чтобы цикл узнал что такая переменная
         существует </p>
-    <img src="{% static 'img/charp/15_arrowmenu/8_settingkey.png' %}" alt="Постановка key выше цикла"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/8_settingkey.png' %}" alt="Постановка key выше цикла"/>
     <p>А затем, так как повторно внутри цикла мы клавишу не вводим, нам нужно ее ввести, в самом конце цикла, сразу
         после отрисовки стрелочки </p>
-    <img src="{% static 'img/charp/15_arrowmenu/9_newkey.png' %}" alt="В конце цикла снова читается Key"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/9_newkey.png' %}" alt="В конце цикла снова читается Key"/>
     <p>Тогда, как только мы нажмем Enter, программа завершается, потому что после нее ничего нет. Но мы можем сделать
         отображение того, что за пункт мы выбрали. Делать мы это будем в зависимости от позиции стрелочки. У нас как раз
         все удобно сделано – 1 строчка – 1 пункт, желтый. 2 строчка – красный и прочее. </p>
-    <img src="{% static 'img/charp/15_arrowmenu/10_menumark.png' %}" alt="Распределение меню по индексам"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/10_menumark.png' %}" alt="Распределение меню по индексам"/>
     <p>И в зависимости от этого, после цикла, мы можем сделать условия и вывести наш пункт</p>
-    <img src="{% static 'img/charp/15_arrowmenu/11_arrowandselect.png' %}" alt="Стрелочное меню и меню выбора"/>
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/11_arrowandselect.png' %}" alt="Стрелочное меню и меню выбора"/>
     <p>Только обязательно нужно поставить курсор в нужную позицию, иначе он выведет сообщение поверх меню </p>
-    <img src="{% static 'img/charp/15_arrowmenu/12_setcursor.png' %}"
+    <img class="mw-100" src="{% static 'img/charp/15_arrowmenu/12_setcursor.png' %}"
          alt="Постановка курсора после меню для корректного вывода"/>
     <p>Итоговый код для меню выглядит следующим образом</p>
     <div class="code-block">

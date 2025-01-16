@@ -29,18 +29,18 @@
     <h4>Продолжения действия только если слева не null</h4>
     <p>Что, если у нашей переменной нет никакого первоначального значения? Что, если она ничему не равна? Например, у
         меня есть вот такие две простые переменные </p>
-    <img src="{% static 'img/charp/11_ternar/1_variables.png' %}" alt="Две переменные типа данных int и string"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/1_variables.png' %}" alt="Две переменные типа данных int и string"/>
     <p>Мы понимаем, что внутри них нет значений, однако коду это тоже нужно как-то обозначить. Для этого, в
         программировании есть значение по умолчанию – пустота, null. Для всех типов данных (КРОМЕ ЧИСЛОВЫХ), если внутри
         нее нет значения, у нее будет значение null. Подробнее об этом можете посмотреть в статье про
         <a href="{% url 'variables' %}" class="default-link">переменные</a></p>
     <p>В случае числовых типов данных, значение по умолчанию – 0. С помощью отладки я посмотрю, что находится внутри
         моих переменных, и увижу пустое значение </p>
-    <img src="{% static 'img/charp/11_ternar/2_valueinvariables.png' %}" alt="Значения внутри переменных"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/2_valueinvariables.png' %}" alt="Значения внутри переменных"/>
     <p>Кроме того, что после равно может ничего не быть, бывают случаи, когда код нам возвращает пустоту. Например,
         методы или Linq запросы могут возвращать null. Например, в этом Linq запросе код не нашел элемент, который равен
         «Нулевой», и вернул значение по умолчанию – null </p>
-    <img src="{% static 'img/charp/11_ternar/3_returnsnull.png' %}" alt="FirstOrDefault вернул null"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/3_returnsnull.png' %}" alt="FirstOrDefault вернул null"/>
     <p>Или вот, я создала метод, который будет возвращать текст или null. Если условие не подходит, мы возвращаем null.
         Я вызвала метод, txt у меня равен «не текст», а значит условие неверно и в переменной будет Null </p>
     <div class="code-block">
@@ -54,25 +54,25 @@
 
             string notFound = ReturnTextOrNull("не текст");</p>
     </div>
-    <img src="{% static 'img/charp/11_ternar/4_notfoundnull.png' %}" alt="Метод вернул null"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/4_notfoundnull.png' %}" alt="Метод вернул null"/>
     <p><b>ВАЖНО – если у меня переменная null, тогда я не могу делать с ней никакие операции </b></p>
     <p>Например, я захотела вызвать метод ToString() к этой переменной, но она была null. Тогда, код покажет мне
         ошибку</p>
-    <img src="{% static 'img/charp/11_ternar/5_nullerror.png' %}" alt="Ничего нельзя сделать если переменная null"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/5_nullerror.png' %}" alt="Ничего нельзя сделать если переменная null"/>
     <p>Значит, мне нужно реализовать проверку на то, не null ли моя переменная. Я могу сделать это с помощью if
         (notFound != null), однако тогда нужно писать достаточно много текста. Вместо этого, я могу просто написать
         вопросительный знак после кусочка кода, который может мне потенциально вернуть null </p>
     <div class="code-block">
         <p class="code-text">string notFound = ReturnTextOrNull("не текст")?.ToString();</p>
     </div>
-    <img src="{% static 'img/charp/11_ternar/6_ternarkpp.png' %}" alt="Вопросительный знак - тернарное выражение"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/6_ternarkpp.png' %}" alt="Вопросительный знак - тернарное выражение"/>
     <p>Тогда, если значение и правда было null, код просто не пойдет дальше. Метод ToString не выполнится, а значит и
         ошибки не будет. </p>
     <div class="code-block">
         <p class="code-text">string notFound = ReturnTextOrNull("не текст")?.ToString();
             Console.WriteLine(notFound);</p>
     </div>
-    <img src="{% static 'img/charp/11_ternar/7_good.png' %}" alt="Код выполнился с тернарником без ошибок"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/7_good.png' %}" alt="Код выполнился с тернарником без ошибок"/>
     <p>Но что, если в случае null, я хочу присвоить своей переменной какое-то значение по умолчанию? </p>
 
 
@@ -93,8 +93,8 @@
         <p class="code-text">string notFound = ReturnTextOrNull("не текст") ?? "По умолчанию";
             Console.WriteLine(notFound);</p>
     </div>
-    <img src="{% static 'img/charp/11_ternar/8_defaultvalue.png' %}" alt="?? взял значение по умолчанию"/>
-    <img src="{% static 'img/charp/11_ternar/9_normalvalue.png' %}" alt="?? взял обычное значение"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/8_defaultvalue.png' %}" alt="?? взял значение по умолчанию"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/9_normalvalue.png' %}" alt="?? взял обычное значение"/>
     <p>Уже понятно, что вещь это удобная, так как она сокращает наш код. У нас может возникнуть вопрос, а если мы
         простой однострочный if записали в одну строку, можем ли мы так сделать и для других if? </p>
 
@@ -126,7 +126,7 @@
     <p>Кратко - любой if, который существует <b>чисто для того</b>, чтобы присвоить в переменную разные значения, и не
         делает больше ничего, можно превратить в тернарное выражение</p>
     <p>У тернарников следующая структура построения: </p>
-    <img src="{% static 'img/charp/11_ternar/10_ternarstruct.png' %}" alt="?? взял обычное значение"/>
+    <img class="mw-100" src="{% static 'img/charp/11_ternar/10_ternarstruct.png' %}" alt="?? взял обычное значение"/>
     <ul>
         <li>Условий может быть несколько, перечисленные через логические операторы И (&&) или ИЛИ (||)</li>
         <li>Выражений должно быть обязательно 2 – для true или false</li>

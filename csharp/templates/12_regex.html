@@ -60,22 +60,22 @@
     <ol>
         <li>
             Мне сто процентов нужно найти «ть». Я напишу ть внутрь формат <br/>
-            <img src="{% static 'img/charp/12_regex/1_firstformat.png' %}" alt="Ть в формате"/>
+            <img class="mw-100" src="{% static 'img/charp/12_regex/1_firstformat.png' %}" alt="Ть в формате"/>
         </li>
         <li>
             И слева и справа нужно любое количество символов. Чтобы найти нужное обозначение для букв-символов, внутри
             строки можно нажать <b>ctrl+пробел</b>. Покажется контекстное меню со всеми доступными вариантами. Внутри
             нужно найти обозначение буквы. Там же можно найти описание этого формата
-            <img src="{% static 'img/charp/12_regex/2_context.png' %}" alt="Контекстное меню для регекса"/>
+            <img class="mw-100" src="{% static 'img/charp/12_regex/2_context.png' %}" alt="Контекстное меню для регекса"/>
         </li>
         <li>
             Нашли, что \w – символ слова. Если я поставлю \w слева и справа, я скажу, что слева и справа может быть по
             символу <br/>
-            <img src="{% static 'img/charp/12_regex/3_secondformat.png' %}" alt="Вокруг ть по символу"/>
+            <img class="mw-100" src="{% static 'img/charp/12_regex/3_secondformat.png' %}" alt="Вокруг ть по символу"/>
             Но мне нужно сказать, что там не один символ, а сколько угодно символов. Для обозначения любого количества
             символов есть *. Поставлю звездочку после \w
             <br/>
-            <img src="{% static 'img/charp/12_regex/4_thirdformat.png' %}" alt="Вокруг ть по много символов"/>
+            <img class="mw-100" src="{% static 'img/charp/12_regex/4_thirdformat.png' %}" alt="Вокруг ть по много символов"/>
         </li>
     </ol>
     <p>С форматом закончили! Теперь строку нужно подставить под формат. Проверку можно сделать несколькими способами:
@@ -102,7 +102,7 @@
             &nbsp; &nbsp; Console.WriteLine(result);
             } </p>
     </div>
-    <img src="{% static 'img/charp/12_regex/5_result.png' %}" alt="Результат формата"/>
+    <img class="mw-100" src="{% static 'img/charp/12_regex/5_result.png' %}" alt="Результат формата"/>
     <p>С форматом можно экспериментировать как угодно! Например, давайте найдем все слова, которые заканчиваются на
         «ся», но внутри есть буква «а». Тогда формат можно представить, как «слева и справа от буквы «а» должно быть
         любое количество символов. В конце «ся», то есть слева любое количество символов, а справа ничего» </p>
@@ -118,7 +118,7 @@
             &nbsp; &nbsp; Console.WriteLine(result);
             } </p>
     </div>
-    <img src="{% static 'img/charp/12_regex/6_resultoneword.png' %}" alt="Результат формата"/>
+    <img class="mw-100" src="{% static 'img/charp/12_regex/6_resultoneword.png' %}" alt="Результат формата"/>
 
 
 
@@ -170,8 +170,8 @@
             &nbsp; &nbsp; Console.WriteLine("почта неверная"); </p>
     </div>
     <p>Попробуем этот код запустить и ввести разные email! </p>
-    <img src="{% static 'img/charp/12_regex/7_goodresult.png' %}" alt="Верная почта"/>
-    <img src="{% static 'img/charp/12_regex/8_badresult.png' %}" alt="Неверная почта"/>
+    <img class="mw-100" src="{% static 'img/charp/12_regex/7_goodresult.png' %}" alt="Верная почта"/>
+    <img class="mw-100" src="{% static 'img/charp/12_regex/8_badresult.png' %}" alt="Неверная почта"/>
     <p>Таким же образом, при помощи IsMatches, можно проверять массивы строк. Просто вместо того, чтобы один раз
         воспользоваться условием с IsMatches, нужно будет пробежаться по всему массиву и поставить условие для каждого
         элемента </p>
@@ -199,8 +199,8 @@
         </li>
     </ul>
     <p>Например, так мы будем игнорировать регистр. </p>
-    <img src="{% static 'img/charp/12_regex/9_ignorecase.png' %}" alt="Игнорирование регистра"/>
-    <img src="{% static 'img/charp/12_regex/10_resultignore.png' %}" alt="Результат при игнорировании"/>
+    <img class="mw-100" src="{% static 'img/charp/12_regex/9_ignorecase.png' %}" alt="Игнорирование регистра"/>
+    <img class="mw-100" src="{% static 'img/charp/12_regex/10_resultignore.png' %}" alt="Результат при игнорировании"/>
     <p>При необходимости можно установить несколько параметров: </p>
     <div class="code-block">
         <p class="code-text">Regex regex = new Regex(@"\w*а\w*ть", RegexOptions.IgnoreCase | RegexOptions.Compiled); </p>

@@ -95,10 +95,10 @@
         Единственный случай, когда в условие можно не ставить оператор, это когда мы сравниваем true или false.
         Следующие два условия будут работать одинаково
     </p>
-    <img src="{% static 'img/charp/6_ifs/1ifwithtrue.png' %}" alt="Конструкция if с сравнением"/>
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/1ifwithtrue.png' %}" alt="Конструкция if с сравнением"/>
     <br/>
     <br/>
-    <img src="{% static 'img/charp/6_ifs/2ifwithouttrue.png' %}" alt="Конструкция if без сравнения"/>
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/2ifwithouttrue.png' %}" alt="Конструкция if без сравнения"/>
 
     <p>
         Код для проверки:
@@ -126,7 +126,7 @@
     <p>
         Единственное – чтобы сделать «не равно», синтаксис будет выглядеть так. Обе эти записи идентичные
     </p>
-    <img src="{% static 'img/charp/6_ifs/3ifwithno.png' %}" alt="Конструкция if с отрицанием"/>
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/3ifwithno.png' %}" alt="Конструкция if с отрицанием"/>
 
     <p>
         Код для проверки:
@@ -203,11 +203,11 @@
         <br/>
         <b>Я хочу, чтобы выполнилось И то, И то - &&</b>
         <br/>
-        <img src="{% static 'img/charp/6_ifs/4tableand.png' %}" alt="Таблица с И"/>
+        <img class="mw-100" src="{% static 'img/charp/6_ifs/4tableand.png' %}" alt="Таблица с И"/>
         <br/>
         <b>Я хочу, чтобы выполнилось ИЛИ то, ИЛИ то – ||</b>
         <br/>
-        <img src="{% static 'img/charp/6_ifs/5tableor.png' %}" alt="Таблица с ИЛИ"/>
+        <img class="mw-100" src="{% static 'img/charp/6_ifs/5tableor.png' %}" alt="Таблица с ИЛИ"/>
     </div>
 
     <hr/>
@@ -242,9 +242,9 @@
     <p>Только в случае «Кофе» у нас выводится ответ «Вот ваш кофе!» Во всех остальных – сообщение «Ничего другого у нас
         нет»</p>
     <p>
-        <img src="{% static 'img/charp/6_ifs/6ifelseresult1.png' %}" alt="Результат if-else в положительном случае"/>
-        <img src="{% static 'img/charp/6_ifs/7ifelseresult2.png' %}" alt="Результат if-else в отрицательном случае"/>
-        <img src="{% static 'img/charp/6_ifs/8ifelseresult3.png' %}" alt="Результат if-else в случае пустоты"/>
+        <img class="mw-100" src="{% static 'img/charp/6_ifs/6ifelseresult1.png' %}" alt="Результат if-else в положительном случае"/>
+        <img class="mw-100" src="{% static 'img/charp/6_ifs/7ifelseresult2.png' %}" alt="Результат if-else в отрицательном случае"/>
+        <img class="mw-100" src="{% static 'img/charp/6_ifs/8ifelseresult3.png' %}" alt="Результат if-else в случае пустоты"/>
     </p>
 
     <p>Но что если мне ооооочень нужно написать условие для какого-то из этих событий в «иначе»? Например, если меня
@@ -275,7 +275,7 @@
     </div>
     <p>Else if начнет работать <b>только</b> если предыдущее условие было неверным. Когда или зачем его использовать,
         если можно просто написать много if? Рассмотрим на двух примерах</p>
-    <img src="{% static 'img/charp/6_ifs/9ifandelseif.png' %}" alt="Разница между if и else-if"/>
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/9ifandelseif.png' %}" alt="Разница между if и else-if"/>
     <p>Конструкция if-if-if работают как множественный выбор – каждый if разрозненный, нужно проверить каждый выбор по
         отдельности: в списке продуктов я могу купить яица, хлеб и молоко, но не купить помидоры. Проверять я буду все
         по списку, от покупки молока не зависит покупка помидоров</p>
@@ -335,7 +335,7 @@
         <li>Весь код пишется не между фигурными скобками, а между case и break</li>
         <li>Вместо else идет default без значения – сразу код, в конце которого будет break</li>
     </ul>
-    <img src="{% static 'img/charp/6_ifs/10ifandswitch.png' %}" alt="Переделка if под switch-case"/>
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/10ifandswitch.png' %}" alt="Переделка if под switch-case"/>
 
     <p>
         Использовать switch-case приятно в том случае, когда у меня есть несколько вариантов значения переменной, но
@@ -346,17 +346,17 @@
         Если мы используем if, мы бы воспользовались оператором ИЛИ (||) и множественными условиями. Код выглядел бы вот
         так
     </p>
-    <img src="{% static 'img/charp/6_ifs/11alotofif.png' %}" alt="Множественные условия в if"/>
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/11alotofif.png' %}" alt="Множественные условия в if"/>
 
     <p>
         В случае с Switch-case конструкция будет проще – над необходимым действием нужно поставить несколько case
     </p>
-    <img src="{% static 'img/charp/6_ifs/12alotofswitch.png' %}" alt="Множественные условия в switch"/>
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/12alotofswitch.png' %}" alt="Множественные условия в switch"/>
 
     <p>
         Полностью измененный код выглядит следующим образом
     </p>
-    <img src="{% static 'img/charp/6_ifs/13ifandswitchwithmorecases.png' %}"
+    <img class="mw-100" src="{% static 'img/charp/6_ifs/13ifandswitchwithmorecases.png' %}"
          alt="Сравнение if и switch в случае с множественными условиями"/>
 
     <p>

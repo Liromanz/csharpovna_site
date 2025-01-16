@@ -24,7 +24,7 @@ p b{
   background: #222;
   padding: 10px;
   border-radius: 10px;
-
+  margin-bottom: 20px;
 }
 
 .code-text{
@@ -33,6 +33,7 @@ p b{
     white-space: pre-line;
     font-family: "Cascadia Code";
     font-size: small;
+    font-weight: initial;
     color: white;
 }
 

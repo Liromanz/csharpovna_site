@@ -40,7 +40,7 @@
     <p>Также я могу проверить в условии какая клавиша была нажата и реализовать какой-то код, связанный с ней. Чтобы
         построить условие, после двойного равно я должна написать ConsoleKey.Названиеклавиши, или выбрать необходимую
         клавишу из списка. </p>
-    <img src="{% static 'img/charp/13_readkey/1_keylist.png' %}" alt="Список клавиш"/>
+    <img class="mw-100" src="{% static 'img/charp/13_readkey/1_keylist.png' %}" alt="Список клавиш"/>
     <p>Например, я хочу клавижу F7 – я так и напишу </p>
     <div class="code-block">
         <p class="code-text">ConsoleKeyInfo key = Console.ReadKey();
@@ -57,7 +57,7 @@
         В нем мы буквально спрашиваем "Есть ли вот такой модификатор у нажатой клавиши?".</p>
     <p>В качестве модификатора считаются клавиши ctrl, alt или shift. Эти же клавиши не будут работать при ReadKey, так
         как они не считаются за клавиши, а считаются за модификаторы.</p>
-    <img src="{% static 'img/charp/13_readkey/2_modifierslist.png' %}" alt="Список модификаторов"/>
+    <img class="mw-100" src="{% static 'img/charp/13_readkey/2_modifierslist.png' %}" alt="Список модификаторов"/>
     <p>Таким образом, мы смотрим есть ли какие-то <b>модификаторы</b> к нашей клавише, добавки. Этими добавками как раз таки и
         являются ctrl, alt или shift.
     </p>
@@ -68,7 +68,7 @@
             if (key.Modifiers.HasFlag(ConsoleModifiers.Control) && key.Key == ConsoleKey.D)
             &nbsp; &nbsp; Console.WriteLine("CTRL + D нажата");</p>
     </div>
-    <img src="{% static 'img/charp/13_readkey/3_modifierexamle.png' %}" alt="Условие с Ctrl+D"/>
+    <img class="mw-100" src="{% static 'img/charp/13_readkey/3_modifierexamle.png' %}" alt="Условие с Ctrl+D"/>
     <p>Чем больше комбинация, тем больше условий надо будет писать. Вот, например, ctrl + shift + enter </p>
     <div class="code-block">
         <p class="code-text">ConsoleKeyInfo key = Console.ReadKey();
@@ -77,5 +77,5 @@
             &nbsp; &nbsp; Console.WriteLine("CTRL + Shift + Enter нажата");
         </p>
     </div>
-    <img src="{% static 'img/charp/13_readkey/4_bigexample.png' %}" alt="Схема LINQ запроса"/>
+    <img class="mw-100" src="{% static 'img/charp/13_readkey/4_bigexample.png' %}" alt="Схема LINQ запроса"/>
 {% endblock %}
