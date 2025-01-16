@@ -28,4 +28,8 @@ urlpatterns = [
     path('classascontainer', v.classascontainer, name='classascontainer'),
     path('modifiers', v.modifiers, name='modifiers'),
     path('staticclass', v.staticclass, name='staticclass'),
+
+
+    path('files', v.files, name='files'),
+
 ]

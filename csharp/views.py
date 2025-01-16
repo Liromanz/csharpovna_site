@@ -107,6 +107,13 @@ def modifiers(request):
 
 
 def staticclass(request):
-    context = {'show_previous_page': True, 'show_next_page': False}
+    context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '20_staticclass.html', context)
 
+
+# ------------------------------------------------------------------------ Классы
+
+
+def files(request):
+    context = {'show_previous_page': True, 'show_next_page': False}
+    return render(request, '21_files.html', context)
