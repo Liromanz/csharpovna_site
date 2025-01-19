@@ -115,5 +115,10 @@ def staticclass(request):
 
 
 def files(request):
-    context = {'show_previous_page': True, 'show_next_page': False}
+    context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '21_files.html', context)
+
+
+def jsonfile(request):
+    context = {'show_previous_page': True, 'show_next_page': False}
+    return render(request, '22_json.html', context)
