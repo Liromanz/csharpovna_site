@@ -36,4 +36,7 @@ urlpatterns = [
     path('directory', v.directory, name='directory'),
     path('process', v.process, name='process'),
 
+
+    path('threads', v.threads, name='threads'),
+
 ]

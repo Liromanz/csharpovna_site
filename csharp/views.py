@@ -135,5 +135,13 @@ def directory(request):
 
 
 def process(request):
-    context = {'show_previous_page': True, 'show_next_page': False}
+    context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '25_process.html', context)
+
+
+# ------------------------------------------------------------------------ Многопоточность
+
+
+def threads(request):
+    context = {'show_previous_page': True, 'show_next_page': False}
+    return render(request, '26_threads.html', context)
