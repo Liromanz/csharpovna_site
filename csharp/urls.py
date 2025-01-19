@@ -32,5 +32,6 @@ urlpatterns = [
 
     path('files', v.files, name='files'),
     path('json', v.jsonfile, name='json'),
+    path('xml', v.xmlfile, name='xml'),
 
 ]

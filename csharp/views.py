@@ -120,5 +120,10 @@ def files(request):
 
 
 def jsonfile(request):
-    context = {'show_previous_page': True, 'show_next_page': False}
+    context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '22_json.html', context)
+
+
+def xmlfile(request):
+    context = {'show_previous_page': True, 'show_next_page': False}
+    return render(request, '23_xml.html', context)

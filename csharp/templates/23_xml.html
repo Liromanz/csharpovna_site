@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content_description %}
+    <h2>Содержание</h2>
+    <ul>
+        <li><a href="#format" class="default-link">Формат XML</a></li>
+        <li><a href="#serdeser" class="default-link">Сериализация и десериализация</a></li>
+        <li><a href="#serialize" class="default-link">Сериализация в файл</a></li>
+        <li><a href="#deserialize" class="default-link">Десериализация из файла</a></li>
+    </ul>
+
+{% endblock %}
+
+{% block previousPage %} {% url 'json' %} {% endblock %}
+{% block nextPage %} {% url 'json' %} {% endblock %}
+
+
+{% block main_info %}
+    <h2 id="format">XML</h2>
+    Кроме JSON есть и другой текстовый формат – XML. XML – некий язык разметки, похожий на HTML, с помощью которого
+    можно как писать документацию, так и передавать данные.  </p>
+    <p>Опять же, как и в прошлой лекции, давайте создадим свой тип данных, некую модель Human, которая будет состоять из
+        имени человека, возраста и коллекции любимых цветов. </p>
+    <p class="text-center"><b>ВАЖНО – ДЛЯ XML ТИП ДАННЫХ ДОЛЖЕН БЫТЬ НЕ INTERNAL, А PUBLIC</b></p>
+    <div class="code-block">
+        <p class="code-text">public class Human
+            {
+            &nbsp; &nbsp; public string Name;
+            &nbsp; &nbsp; public int Age;
+            &nbsp; &nbsp; public string[] MyFavoriteColour;
+            }</p>
+    </div>
+    <p>Если я захочу создать новый экземпляр своей модели, некую переменную, где я буду хранить информацию, я сделаю
+        это, например, следующим образом: создам переменную своего типа данных, а затем заполню ее значениями – текстом,
+        числом и текстовым массивом </p>
+    <div class="code-block">
+        <p class="code-text">string[] favoriteColour = new string[] { "Зеленый", "Синий", "Оранжевый" };
+
+            Human sofia = new Human();
+            sofia.Name = "София Алексеевна";
+            sofia. Age = 60;
+            sofia.MyFavoriteColour = favoriteColour;</p>
+    </div>
+    <p>Точно такую же информацию я могу представить в виде XML. В чистом виде он выглядит вот так </p>
+    <div class="code-block">
+        <p class="code-text" style="color: dodgerblue">&lt;?xml version="1.0" encoding="utf=8"?&gt;
+            &lt;Human xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+            &nbsp; &nbsp; &lt;Name&gt;София Алексеевна&lt;/Name&gt;
+            &nbsp; &nbsp; &lt;Age&gt;60&lt;/Age&gt;
+            &nbsp; &nbsp; &lt;MyFavoriteColour&gt;
+            &nbsp; &nbsp; &nbsp; &nbsp; &lt;string&gt;Зеленый&lt;/string&gt;
+            &nbsp; &nbsp; &nbsp; &nbsp; &lt;string&gt;Синий&lt;/string&gt;
+            &nbsp; &nbsp; &nbsp; &nbsp; &lt;string&gt;Оранжевый&lt;/string&gt;
+            &nbsp; &nbsp; &lt;/MyFavoriteColour&gt;
+            &lt;/Human&gt;
+        </p>
+    </div>
+    <p>Добавлю описания, чтобы визуально было понятно, что за что отвечает </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/1_xmldesc.png' %}" alt="Описание XML файла"/>
+    <p>Как мы можем заметить, в отличии от JSON, здесь нет четкого разделения на типы данных, только если это не массив.
+        Переменная Age может быть как типа данных int, так и типа данных double, string, float и т.п. Главное – чтобы
+        название каждого тэга совпадало с названием внутри нашего типа данных – класс называется Human, переменная с
+        именем – Name, переменная с возрастом – Age и т.п. </p>
+    <p>Значит, если мы видим, что внутри какого-то большого тэга хранятся названия, а не типы данных, мы понимаем, что
+        мы должны создать подобную модель. Если мы видим, что внутри переменной есть еще какие-то дочерние элементы, это
+        значит, что это массив </p>
+    <p>Рассмотрим пример с листом. Как в предыдущей лекции, создам коллекцию из нескольких людей и добавлю их в гибкую
+        коллекцию – лист. </p>
+    <div class="code-block">
+        <p class="code-text">Human sofia = new Human();
+            sofia.Name = "София Алексеевна";
+            sofia. Age = 60;
+            sofia.MyFavoriteColour = new string[] { "Зеленый", "Синий", "Оранжевый" };
+
+
+            Human jenya = new Human();
+            jenya.Name = "Евгений";
+            jenya.Age = 16;
+            jenya.MyFavoriteColour = new string[] { "Темно-зеленый", "Темно-синий" };
+
+
+            Human sasha = new Human();
+            sasha.Name = "Александр";
+            sasha Age = 17;
+            sasha.MyFavoriteColour = new string[] { "Синий", "Желтый" };
+
+            // ///////// Список из людей
+            List&lt;Human&gt; humans = new List&lt;Human&gt;();
+            humans.Add(sofia);
+            humans.Add(jenya);
+            humans.Add(sasha);
+            // /////////
+        </p>
+    </div>
+    <p>В случае с XML, все модели Human будут взяты в один общий тэг – ArrayOfHumans. И ему опять же не важно, что это
+        за коллекция, главное, чтобы она была </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/2_xmlcollection.png' %}" alt="Коллекция XML"/>
+    <p>Дальше, давайте разберемся с тем, как работать с XML из кода </p>
+
+
+
+
+    <hr id="serdeser"/>
+    <h2>Сериализация и десериализация</h2>
+    <p>XML -формат также можно сериализовывать и десериализовывать. Напомню то, что мы обсуждали в
+        <a href="{% url 'json' %}#serdeser" class="default-link">JSON</a>:</p>
+    <ul>
+        <li>Десериализация – когда мы читаем текстовый файл (или просто текст с каким-то форматом), переносим его на
+            код, и работаем с ним из кода, т.е из текста в модель
+        </li>
+        <li>Сериализация – когда мы из когда записываем данные обратно в текстовый файл или текст, т.е. из модели в
+            текст
+        </li>
+    </ul>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/3_serdeser.png' %}"
+         alt="Макет сериализации и десериализации стрелочками"/>
+    <p>В случае с XML – сериализация – преобразование модели в XML, и десериализация – преобразование XML в модель. </p>
+
+
+
+
+    <hr id="serialize"/>
+    <h2>Сериализация в файл</h2>
+    <p>Начнем с сериализации. Чтобы начать работу с XML, необходимо этот XML сериализатор создать. Сделаем отдельную
+        переменную типа данных XmlSerializer, с помощью которой мы будем все сохранять в файл. Этот тип данных сложный,
+        он заставляет нас думать, так что обьявляем мы его через new </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/4_noclass.png' %}" alt="Ошибка, что нет класса внутри "/>
+    <p>Видим, что на обычное создание у нас код ругается. Он хочет какой-то тип внутри круглых скобок. Этот тип – тип
+        данных, который мы хотим сохранить. Например, сейчас я хочу сохранить свою переменную sofia, она имеет тип
+        данных Human. Значит внутрь круглых скобок я и укажу этот тип данных </p>
+    <p>Но ему опять что-то не нравится </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/5_notype.png' %}" alt="Ошибка, что нет type"/>
+    <p>Дело в том, что Human – это, по сути, класс. А мы хотим сказать, что это именно тип данных. Чтобы сделать это
+        именно как тип данных, необходимо написать typeof(ТипДанных), в нашем случае - Human. Вот теперь то все будет
+        хорошо </p>
+    <div class="code-block">
+        <p class="code-text">XmlSerializer xml = new XmlSerializer(typeof(Human));</p>
+    </div>
+    <p>Идем дальше. Я хочу использовать переменную xml, а именно, сериализацию. Я так и напишу – xml.Serialize(). Внутрь
+        круглых скобок я должна передать то, что я хочу сериализовать, давайте в этом разбираться </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/6_serializeerror.png' %}" alt="Пустой сериализатор"/>
+    <p>Внутри нам нужно два значения – какой-то стрим, ака поток и какой-то объект. С объектом все понятно – там будет
+        объект, который я хочу сериализовать, т.е. переменную sofia. Но что за поток? </p>
+    <p>Если кратко, с файлами можно работать не только через File.Write() и File.Read(), но и через некий поток данных,
+        через которых можно понять – доступен ли файл, можно ли сейчас через этот поток что-либо записать, можно ли
+        прочитать этот файл и т.п. Эти потоки – как процесс на компьютере: если мой поток сейчас работает с этим файлом,
+        то никакой другой процесс не может использовать этот файл. </p>
+    <p>Потоки существуют для того, чтобы частично читать или записывать данные в файл (например, мне нужно прочитать
+        файлик на 2 ГБ. Если я просто воспользуюсь File.ReadAllText, все содержимое файла сохранится в оперативную
+        память, и производительность сильно упадет), или, если чтение\запись - слишком длительный процесс, потоком можно
+        заблокировать файл, пока процесс точно не завершиться. </p>
+    <p>Так как xml волнуется о защите своих данных и формировании верной структуры, он также просит поток данных. </p>
+    <p>Итак, нам необходимо открыть наш файл как поток, т.е. создать файловый поток (FileStream), указать, для каких
+        задач мы его создаем (открыть, создать и открыть, записать туда данные) его открыть, и его закрыть. Для потоков
+        существует специальный контейнер – using, где открывающая фигурная скобка – открытие потока, а закрывающая – ее
+        закрытие соответственно. Давайте создадим следующий поток для файла </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/7_stream.png' %}" alt="Конструкция using"/>
+    <p>И уже внутри мы будем использовать xml.Serialize(). Первое значение будет fs – наш поток, а второе – объект,
+        который я хочу сериализовать. </p>
+    <div class="code-block">
+        <p class="code-text">Human sofia = new Human();
+            sofia.Name = "София Алексеевна";
+            sofia. Age = 60;
+            sofia.MyFavoriteColour = new string[] { "Зеленый", "Синий", "Оранжевый" };
+
+            XmlSerializer xml = new XmlSerializer(typeof(Human));
+            using (FileStream fs = new FileStream("D:\\Рабочий стол\\sdfsd.xml", FileMode.OpenOrCreate))
+            {
+            &nbsp; &nbsp; xml.Serialize(fs, sofia);
+            }</p>
+    </div>
+    <p>Итак, по итогу, у нас есть несколько пунктов, которые мы должны учитывать: </p>
+    <ul>
+        <li>Когда мы создаем переменную XmlSerializer, внутри мы должны указать тип данных, который мы хотим
+            сериализовать. Указываем через typeof()
+        </li>
+        <li>Для сериализации нам нужен поток, его делаем через using. Внутри указываем путь до файла и то, как мы хотим
+            с ним работать
+        </li>
+        <li>Чтобы сериализовать, используем xml.Serialize(). Внутри передаем поток и объект, который мы хотим
+            сериализовать
+        </li>
+    </ul>
+    <p>На выходе, у меня будет следующий файл </p>
+    <div class="code-block">
+        <p class="code-text" style="color: dodgerblue">&lt;?xml version="1.0" encoding="utf=8"?&gt;
+            &lt;Human xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+            &nbsp; &nbsp; &lt;Name&gt;София Алексеевна&lt;/Name&gt;
+            &nbsp; &nbsp; &lt;Age&gt;60&lt;/Age&gt;
+            &nbsp; &nbsp; &lt;MyFavoriteColour&gt;
+            &nbsp; &nbsp; &nbsp; &nbsp; &lt;string&gt;Зеленый&lt;/string&gt;
+            &nbsp; &nbsp; &nbsp; &nbsp; &lt;string&gt;Синий&lt;/string&gt;
+            &nbsp; &nbsp; &nbsp; &nbsp; &lt;string&gt;Оранжевый&lt;/string&gt;
+            &nbsp; &nbsp; &lt;/MyFavoriteColour&gt;
+            &lt;/Human&gt;
+        </p>
+    </div>
+
+
+
+
+
+    <hr id="serialize"/>
+    <h2>Десериализация из файла</h2>
+    <p>Для десериализации нам понадобится все то же самое, что было нужно для сериализации – XmlSerializer и поток.
+        Единственное отличие – вместо OpenOrCreate мы только открываем файл, т.е. у нас будет FileMode.Open. Сразу
+        создам переменную и поток </p>
+    <p class="text-center"><b>ВАЖНО – тип данных XmlSerializer все равно останется в XmlSerializer, даже для
+        десериализации </b></p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/8_filemode.png' %}" alt="Изменение FileMode"/>
+    <p>Теперь, я хочу десериализовать данные из файла. Получившийся результат я хочу сохранить в некую переменную типа
+        данных Human. Создам ее чуть выше</p>
+    <div class="code-block">
+        <p class="code-text">Human human;
+
+            XmlSerializer xml = new XmlSerializer(typeof(Human));
+            using (FileStream fs = new FileStream("D:\\Рабочий стол\\sdfsd.xml", FileMode.Open))
+            {
+
+            }</p>
+    </div>
+    <p>А затем, я присвою human десериализуемое значение. Чтобы получить это значение, надо использовать мой
+        сериализатор (переменная xml), а именно, десериализацию. Внутри, в круглых скобках, мне необходимо только
+        указать поток файла, из которого я хочу прочитать </p>
+    <p>Однако, просто записав так, у меня будет ошибка </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/9_desererror.png' %}" alt="Ошибка десериализации"/>
+    <p>Ошибка решается очень просто – либо alt+enter (или ПКМ -> Быстрые действия и рефакторинг) и выбор самого первого
+        пункта </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/10_refactor.png' %}"
+         alt="Использование быстрых действий и рефакторинга"/>
+    <p>…либо <a href="{% url 'transformation' %}#explict" class="default-link">явно преобразовать</a> к типу данных, который я хочу получить в итоге. Для этого, перед значением, надо в
+        круглых скобках указать, что за тип данных я хочу получить </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/11_human.png' %}" alt="Явное приведение"/>
+    <p>По итогу, мой код будет следующим </p>
+    <div class="code-block">
+        <p class="code-text">Human human;
+
+            XmlSerializer xml = new XmlSerializer(typeof(Human));
+            using (FileStream fs = new FileStream("D:\\Рабочий стол\\sdfsd.xml", FileMode.Open))
+            {
+            &nbsp; &nbsp; human = (Human)xml.Deserialize(fs);
+            }</p>
+    </div>
+    <p>А значение в переменной – следующим </p>
+    <img class="mw-100" src="{% static 'img/charp/23_xml/12_deserdebug.png' %}" alt="Значения при десериализации"/>
+    <p>Таким образом, я могу использовать все значения после using, например, вывести их в консоль и посмотреть
+        результат.</p>
+    <div class="code-block">
+        <p class="code-text">Human human;
+
+            XmlSerializer xml = new XmlSerializer(typeof(Human));
+            using (FileStream fs = new FileStream("D:\\Рабочий стол\\sdfsd.xml", FileMode.Open))
+            {
+            &nbsp; &nbsp; human = (Human)xml.Deserialize(fs);
+            }
+
+            Console.WriteLine(human.Name);
+            Console.WriteLine(human.Age);
+            foreach(var item in human.MyFavoriteColour){
+            &nbsp; &nbsp; Console.WriteLine("-" + item);
+            }
+        </p>
+    </div>
+{% endblock %}
