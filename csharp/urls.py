@@ -39,4 +39,6 @@ urlpatterns = [
 
     path('threads', v.threads, name='threads'),
 
+
+    path('tests', v.tests, name='tests'),
 ]

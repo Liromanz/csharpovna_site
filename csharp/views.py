@@ -143,5 +143,13 @@ def process(request):
 
 
 def threads(request):
-    context = {'show_previous_page': True, 'show_next_page': False}
+    context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '26_threads.html', context)
+
+
+# ------------------------------------------------------------------------ Тестирование
+
+
+def tests(request):
+    context = {'show_previous_page': True, 'show_next_page': False}
+    return render(request, '32_tests.html', context)
