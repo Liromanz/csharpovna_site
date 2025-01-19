@@ -34,5 +34,6 @@ urlpatterns = [
     path('json', v.jsonfile, name='json'),
     path('xml', v.xmlfile, name='xml'),
     path('directory', v.directory, name='directory'),
+    path('process', v.process, name='process'),
 
 ]
