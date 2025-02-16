@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block previousPage %} {% url 'threads' %} {% endblock %}
+{% block nextPage %} {% url 'enum' %} {% endblock %}
+
+
+{% block main_info %}
+    <h2 class="anchor">Наследование, базовые типы </h2>
+    <p>В нашем мире все можно привести к первозданному виду. Например, мухоморы и опята – это частный случай грибов.
+        Грузовые и пассажирские поезда – частные случаи поездов. </p>
+    <p>У этих первозданных объектов есть какие-то свойства и действия, которые также будут находится во всех частных
+        случаях. Те же поезда – у них есть количество вагонов, название, производитель. Однако из поездов можно сделать
+        еще грузовые и пассажирские поезда. Внутри грузовых будут добавлены еще свои уникальные свойства – например, тип
+        перевозимого груза. Внутри пассажирского будут добавлены свои – например, количество пассажирских мест. </p>
+    <img class="mw-100" src="{% static 'img/charp/27_inheritance/1_trainsscheme.png' %}" alt="Схема поездов"/>
+    <p>Такую же структуру можно реализовать через три <a href="{% url 'classasmodel' %}" class="defailt-link">класса</a>
+        и наследовать класс поезд для грузового и пассажирского
+        поезда. При наследовании, все переменные и методы уже могут быть использованы в дочерних классах. </p>
+    <p>Давайте реализуем эти поезда в коде. Для начала создадим родительский класс поезд – Train </p>
+    <div class="code-block">
+        <p class="code-text">internal class Train
+            {
+            &nbsp; &nbsp; public string Name; //Название
+            &nbsp; &nbsp; public int CarriageAmount; //Количество вагонов
+            &nbsp; &nbsp; public string Manufacturer; //Производитель
+            }</p>
+    </div>
+    <p>А затем реализуем дочерние классы – CargoTrain и PassangerTrain. В этих классах мы будем наследовать основу
+        поезда. Для того, чтобы наследовать, нам необходимо после название через двоеточие указать родительский класс –
+        Train </p>
+    <p>Если наши классы будут наследовать Train, там уже будут созданы переменные Name, CarriageAmount и Manufacturer, в
+        дочернем классе нужно указать только то, что еще не было создано. ВАЖНО - в C# наследоваться можно ТОЛЬКО ОТ
+        ОДНОГО класса</p>
+    <img class="mw-100" src="{% static 'img/charp/27_inheritance/2_inheritanceinclasses.png' %}"
+         alt="Наследование в классах"/>
+    <div class="code-block">
+        <p class="code-text"> // класс с грузовым поездом, условно, файл CargoTrain.cs
+            internal class CargoTrain : Train
+            {
+            &nbsp; &nbsp; public string CargoType;
+            }
+
+            // класс с пассажирским поездом, условно, файл PassengerTrain.cs
+            internal class PassengerTrain : Train
+            {
+            &nbsp; &nbsp; public int PassengerPlaceAmount;
+            }</p>
+    </div>
+    <p>Теперь, когда мы будем создавать типы данных CargoTrain и PassangerTrain, мы сможем использовать все четыре
+        переменные - три основные, при наследовании, и одну из каждого класса по отдельности.</p>
+    <img class="mw-100" src="{% static 'img/charp/27_inheritance/3_passengersuggest.png' %}"
+         alt="Предложения в PassengerTrain"/>
+    <img class="mw-100" src="{% static 'img/charp/27_inheritance/4_cargosuggest.png' %}"
+         alt="Предложения в CargoTrain"/>
+    <p>Эти переменные можно будет использовать везде – в <a href="{% url 'classascontainer' %}#constructor"
+                                                            class="defailt-link">конструкторах</a>,
+        при <a href="{% url 'json' %}#serdeser" class="defailt-link">сериализации</a>,
+        при <a href="{% url 'classasmodel' %}#using" class="defailt-link">выводе</a> и прочее прочее прочее. </p>
+    <p>Явный пример наследования – разные <a href="{% url 'variables' %}" class="defailt-link">типы данных</a>. Внутри
+        типа данных string, int, bool и прочее уже находятся
+        какие-то методы, и они общие для всех типов данных. Откуда они взялись? </p>
+    <img class="mw-100" src="{% static 'img/charp/27_inheritance/5_basetypes.png' %}"
+         alt="Базовые типы данных и их свойства"/>
+    <p>Все эти типы данных наследуются от типа данных object. Сам object по умолчанию может хранить в себе все объекты –
+        текст, число, символ. А потом, уже для каждого своего типа данных, реализуются свои уникальные свойства – для
+        string – обработка текста как массив символов, и т.п.
+    </p>
+    <p>В чем преимущество реализации наследования в своих программах? </p>
+    <p>Мы можем делать еще более уникальные методы с родительским объектом, хотя передавать мы будем дочерние объекты.
+        На примере с тем же поездом – метод принимает в себя родителя – Train, а значит мы можем передавать в этот метод
+        все, что наследуется от Train – пассажирские и грузовые поезда </p>
+    <p>Такой вариант передачи называется <b>Downcast – от дочернего класса до родительского</b></p>
+    <div class="code-block">
+        <p class="code-text">void ShowTrain(Train train) // передаем Train - родителя
+            {
+            &nbsp; &nbsp; Console.WriteLine(train.Name);
+            &nbsp; &nbsp; Console.WriteLine(train.CarriageAmount);
+            &nbsp; &nbsp; Console.WriteLine(train.Manufacturer);
+            }
+
+            PassengerTrain passTrain = new PassengerTrain();
+            passTrain.Name = "Ласточка";
+            passTrain.CarriageAmount = 10;
+            passTrain.Manufacturer = "Siemens";
+            ShowTrain(passTrain); // в метод можно передать PassengerTrain, потому что он 100% имеет все то же, что и Train, так как идет наследование
+
+            CargoTrain cargoTrain = new CargoTrain();
+            cargoTrain.Name = "Крылатка";
+            cargoTrain.CarriageAmount = 20;
+            cargoTrain.Manufacturer = "Siemens";
+            ShowTrain(cargoTrain); // по этой же схеме, так как CargoTrain наследуется от Train, мы можем передать его в             метод
+        </p>
+    </div>
+    <p>И наоборот – в методе мы можем принимать дочерние объекты, а передавать родительские, т.е. принимать string, а
+        передавать object. Однако в этом случае нам придется <a href="{% url 'transformation' %}#explict"
+                                                                class="default-link">приводить</a>
+        передаваемому переменную к типу данных string </p>
+    <p>Такой вариант передачи называется <b>Upcast – от родительского класса до дочернему</b> </p>
+    <div class="code-block">
+        <p class="code-text">void ShowText(string text)
+            {
+            &nbsp; &nbsp; Console.WriteLine(text);
+            }
+
+            object obj = "Текст":
+            ShowText((string)obj);</p>
+    </div>
+{% endblock %}
