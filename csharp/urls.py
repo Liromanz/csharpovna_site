@@ -40,5 +40,8 @@ urlpatterns = [
     path('threads', v.threads, name='threads'),
 
 
+    path('enum', v.enum, name='enum'),
+
+
     path('tests', v.tests, name='tests'),
 ]
