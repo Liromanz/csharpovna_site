@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content_description %}
+    <h2>Содержание</h2>
+    <ul>
+        <li><a href="#code" class="default-link">Реализация интерфейсов</a></li>
+        <li><a href="#usage" class="default-link">Использование интерфейсов</a></li>
+    </ul>
+
+{% endblock %}
+
+{% block previousPage %} {% url 'nasled' %} {% endblock %}
+{% block nextPage %} {% url 'enum' %} {% endblock %}
+
+
+{% block main_info %}
+    <h2 class="anchor">Интерфейсы</h2>
+    Когда мы открываем класс с кодом и хотим понять, какие методы внутри у нас есть, если внутри методов будет очень
+    много кода, среди него будет сложно найти сами методы. Было бы неплохо, если бы у нас было какое-то оглавление с
+    нашими методами, как в книгах – название глав на первой страничке. Мы можем такое реализовать </p>
+    <p>Если в книге обязательный список глав называется оглавление, то обязательный список методов называется интерфейс.
+        Интерфейс – новый класс, где вместо слова class будет написано interface. Названия интерфейсов называются с
+        буквы I. </p>
+    <p>Зачем это надо? При помощи интерфейса мы сможем вызывать одни и те же методы, но их реализация будет отличаться в
+        зависимости от того, какой класс мы передали. </p>
+    <p>Примеры:</p>
+    <ul>
+        <li>В реальной жизни - на производствах всегда что-то создают. Но на заводе машин создают машины, на заводе
+            компьютерах создают компьютеры, а на заводе мороженого делаю мороженое. Процесс их создания разный, но при
+            проверке завода проверяют одно и то же - создание
+        </li>
+        <li>В реальной жизни - я хочу узнать, как работают интерфейсы в разных языках программирования - в C#, Java и
+            Go. Я прихожу в книжный и нахожу 3 книги по 3 разным языкам программирования. Но я не читаю всю книгу чтобы
+            найти информацию об интерфейсах, я иду в оглавление, ищу слово “Интерфейсы”, а потом уже читаю про них.
+            Наполнение книги в трех разных случаях будет разным, но в оглавлении всегда есть слово “Интерфейсы”
+        </li>
+        <li>В коде - я хочу сделать приложение, которое будет импортировать данные в БД. Хочу, чтобы у меня
+            импортировались 2 формата файла - xml и json, и импортировалось по перетаскиванию. Приложению должно быть
+            все равно что он импортирует, он просто должен импортировать. Но логика для xml и json разная. Тогда, я могу
+            воспользоваться интерфейсом “IImport” с одним методом Import, а потом сделать два класса - XmlImport и
+            JsonImport, наследуемых от импорта. Логика в этих классах будет разная, но у них будет единый метод -
+            Import, через которое приложение сможет обращаться к импорту, не задумываясь о том, что за файл он
+            импортирует
+        </li>
+    </ul>
+    <hr/>
+    <p>На коде рассмотрим следующий пример: у меня есть база данных из двух табличек. Для всех табличек должны быть
+        реализованы методы по добавлению, изменению, удалению и чтению данных их них. Значит во всех двух классах у меня
+        должны быть методы Create, Read, Update и Delete (далее – <b>CRUD операции</b>). Я могу создать какой-то
+        интерфейс с оглавлением этих операций, а затем наследовать этот класс в два класса для табличек. Таким образом я
+        скажу, что в этих классах обязательно должна быть логика CRUD операций </p>
+
+
+
+
+    <hr class="anchor" id="code"/>
+    <h4>Реализация</h4>
+    <p>Немного подготовимся к реализации нашего примера. Создам два <a href="{% url 'classasmodel' %}"
+                                                                       class="default-link">класса</a> - Car.cs и
+        Computer.cs - это будет две мои аля-таблицы. Базы данных то у нас нет, поэтому вместо таблицы в БД будет класс
+        как тип данных</p>
+    <p>Файл Car.cs</p>
+    <div class="code-block">
+        <p class="code-text">
+            internal class Car
+            {
+            &nbsp; &nbsp; public string Name;
+            &nbsp; &nbsp; public string Type;
+            &nbsp; &nbsp; public int Year;
+            }
+        </p>
+    </div>
+    <p>Файл Computer.cs</p>
+    <div class="code-block">
+        <p class="code-text">internal class Computer
+            {
+            &nbsp; &nbsp; public string Manufacturer;
+            &nbsp; &nbsp; public string Processor;
+            &nbsp; &nbsp; public string VideoCard;
+            &nbsp; &nbsp; public int PhysicalMemorySize;
+            &nbsp; &nbsp; public int OperateMemorySize;
+            }</p>
+    </div>
+    <p>Вернемся к интерфейсам. Я создам интерфейс с CRUD операциями. Для этого, на равне с Program.cs создам отдельный
+        файл ICrud.cs.
+        Заметьте, что вместо слова class стоит interface</p>
+    <div class="code-block">
+        <p class="code-text">internal interface ICrud
+            {
+            &nbsp; &nbsp; void Create();
+            &nbsp; &nbsp; void Read();
+            &nbsp; &nbsp; void Update();
+            &nbsp; &nbsp; void Delete();
+            }</p>
+    </div>
+    <p>Заметьте, что тут мы логику для метода не реализуем. Мы пишем только название и возвращаемый тип данных, а
+        остальные модификаторы (public, static) мы будем писать уже когда будем <a href="{% url 'nasled' %}"
+                                                                                   class="default-link">наследовать</a>
+        этот интерфейс и делать его
+        реализацию. </p>
+    <p>Теперь этот интерфейс можно наследовать. Создам <a href="{% url 'classascontainer' %}"
+                                                          class="default-link">класс</a>, который будет содержать в себе
+        все CRUD операции для таблицы. В виде таблицы у меня будет <a href="{% url 'collections' %}#list"
+                                                                      class="default-link">лист</a> с машинами </p>
+    <div class="code-block">
+        <p class="code-text"> internal class CarTable
+            {
+            &nbsp; &nbsp; private List&lt;Car&gt; Cars = new List&lt;Car&gt;();
+            }
+        </p>
+    </div>
+    <p>Я хочу сказать, что в этой таблице обязательно должны быть CRUD – операции. Все перечисленные CRUD операции у
+        меня хранятся в моем интерфейсе. Тогда мне его надо наследовать
+    </p>
+    <p> Однако если я его буду просто наследовать, тогда у меня появятся ошибки, что у меня нет реализованной логики для
+        перечисленных внутри <a href="{% url 'methods' %}" class="default-link">методов</a></p>
+    <img class="mw-100" src="{% static 'img/charp/28_interface/1_notimplemented.png' %}" alt="Методы не реализованы"/>
+    <p>Для того, чтобы их создать, их нужно либо написать вручную, либо нажать alt + enter (или ПКМ – Быстрые действия и
+        рефакторинг) и выбрать пункт «Реализовать интерфейс». Тогда все эти методы у меня появятся </p>
+    <p>Их код внутри я очищу </p>
+    <div class="code-block">
+        <p class="code-text">internal class CarTable : ICrud
+            {
+            &nbsp; &nbsp; private List&lt;Car&gt; Cars = new List&lt;Car&gt;();
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public void Create()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public void Delete()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public void Read()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public void Update()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; }
+            }</p>
+    </div>
+    <p>Все 4 метода должны обязательно присутствовать в этом классе, иначе интерфейс будет ругаться, что какая-то логика
+        для метода не реализована. Т.е. у нас не может не быть одного из этих методов. Зато может быть больше!
+        Единственное, что важно - все методы из интерфейса должны быть реализованы в классе.</p>
+    <p>После их создания, я могу реализовать их логику для одного частного случая – для машин. </p>
+    <div class="code-block">
+        <p class="code-text">internal class CarTable : ICrud
+            {
+            &nbsp; &nbsp; private List&lt;Car&gt; Cars = new List&lt;Car&gt;();
+            &nbsp; &nbsp; public void Create()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Car car = new Car();
+            &nbsp; &nbsp; &nbsp; &nbsp; car.Name = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; car.Type = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; car.Year = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; Cars.Add(car);
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; public void Read()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; foreach (var item in Cars)
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Name);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Type);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Year);
+            &nbsp; &nbsp; &nbsp; &nbsp; }
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; public void Update()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Car first = Cars.FirstOrDefault();
+            &nbsp; &nbsp; &nbsp; &nbsp; if (first != null)
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Name = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Type = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Year = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Cars[0] = first;
+            &nbsp; &nbsp; &nbsp; &nbsp; }
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; public void Delete()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Cars.RemoveAt(0);
+            &nbsp; &nbsp; }
+            }</p>
+    </div>
+    <p>Но сейчас удаление и обновление - заглушки. Мы всегда удаляем и изменяем первый элемент. А я хочу менять его по
+        индексу, который передаст мне пользователь. Добавлю такие <a href="{% url 'methods' %}#parameters"
+                                                                     class="default-link">параметры</a> в методы Update
+        и Delete</p>
+    <p>Но проблема - появляется ошибка, что такие методы не подходят под реализацию интерфейса</p>
+    <img class="mw-100" src="{% static 'img/charp/28_interface/2_addindex.png' %}"
+         alt="Добавленные параметры вызывают ошибки"/>
+    <p>Так происходит потому, что методы визуально отличаются от тех, что находятся в ICrud. Чтобы все корректно
+        работало, нам нужно добавить такие же параметры и в интерфейсы</p>
+    <div class="code-block">
+        <p class="code-text">internal interface ICrud
+            {
+            &nbsp; &nbsp; void Create();
+            &nbsp; &nbsp; void Read();
+            &nbsp; &nbsp; void Update(int index); // Добавили параметр
+            &nbsp; &nbsp; void Delete(int index); // Добавили параметр
+            }</p>
+    </div>
+    <p>Тогда, в CarTable все ошибки пропадут, а мы сможем использовать эти индексы уже на коде. Видоизменю два метода -
+        Update и Delete - так, чтобы они изменяли и удаляли не первый обьект, а тот, что попросили</p>
+    <div class="code-block">
+        <p class="code-text">internal class CarTable : ICrud
+            {
+            &nbsp; &nbsp; private List&lt;Car&gt; Cars = new List&lt;Car&gt;();
+            &nbsp; &nbsp; public void Create()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Car car = new Car();
+            &nbsp; &nbsp; &nbsp; &nbsp; car.Name = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; car.Type = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; car.Year = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; Cars.Add(car);
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; public void Read()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; foreach (var item in Cars)
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Name);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Type);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Year);
+            &nbsp; &nbsp; &nbsp; &nbsp; }
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; public void Update(int index)
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Car first = Cars[index];
+            &nbsp; &nbsp; &nbsp; &nbsp; if (first != null)
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Name = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Type = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Year = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Cars[index] = first;
+            &nbsp; &nbsp; &nbsp; &nbsp; }
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp; public void Delete()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Cars.RemoveAt(index);
+            &nbsp; &nbsp; }
+            }</p>
+    </div>
+    <p>Таким образом у нас по одному интерфейсу (оглавлению) реализована логика для одной таблицы. Таким же образом, по
+        тому же интерфейсу, можно реализовать логику для других таблиц, например, уже не для машины, а для компьютеров
+        (лист с компьютерами, к которым можно применить CRUD операции. Внутри этого класса тоже будет
+        <a href="{% url 'nasled' %}" class="default-link">наследоваться</a> интерфейс ICrud, однако логика самого класса
+        уже будет своя) </p>
+    <div class="code-block">
+        <p class="code-text">internal class ComputerTable : ICrud
+            {
+            &nbsp; &nbsp; public List &lt;Computer&gt; Computers= new List&lt;Computer&gt;();
+
+            &nbsp; &nbsp; public void Create()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Computer comp = new Computer();
+            &nbsp; &nbsp; &nbsp; &nbsp; comp.Manufacturer = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; comp.Processor = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; comp.VideoCard = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; comp.PhysicalMemorySize = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp; comp.OperateMemorySize = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            &nbsp; &nbsp; &nbsp; &nbsp; Computers.Add(comp);
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public void Read()
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; foreach (var item in Computers)
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Manufacturer);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.Processor);
+            Console.WriteLine(item.VideoCard);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.PhysicalMemorySize);
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Console.WriteLine(item.OperateMemorySize);
+            &nbsp; &nbsp; &nbsp; &nbsp; }
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public void Update(int index)
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Computer first = Computers[index];
+            &nbsp; &nbsp; &nbsp; &nbsp; if (first != null)
+            &nbsp; &nbsp; &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Manufacturer = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.Processor = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.VideoCard = Console.ReadLine();
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.PhysicalMemorySize = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; first.OperateMemorySize = Convert.ToInt32(Console.ReadLine());
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Computers[index] = first;
+            &nbsp; &nbsp; &nbsp; &nbsp; }
+            &nbsp; &nbsp; }
+            &nbsp; &nbsp;
+            &nbsp; &nbsp; public void Delete(int index)
+            &nbsp; &nbsp; {
+            &nbsp; &nbsp; &nbsp; &nbsp; Computers.RemoveAt(index);
+            &nbsp; &nbsp; }
+            }
+        </p>
+    </div>
+    <p>Интерфейс никак не влияет на саму логику класса, он просто обязывает реализовать некоторое количество методов
+        внутри этого класса. Методов может быть больше, но никак не может быть меньше</p>
+    <p>Говоря определениями, <b>интерфейс - контракт о поведении</b>. Множество классов, даже не связанных отношением
+        наследования, могут объявить, что они обязуются соблюдать этот контракт (<b>имплементация</b> интерфейса). </p>
+
+
+
+
+
+
+    <hr class="anchor" id="usage"/>
+    <h4>Применение</h4>
+    <p>Использовать его можно следующим способом. Перейдем обратно в Program.cs и создадим метод, который в качестве
+        параметра будет принимать ICrud. Там же создадим 2 <a href="{% url 'classasmodel' %}#using"
+                                                              class="default-link">экземпляра класса</a> - ComputerTable
+        comp и CarTable car</p>
+    <p>Раз мы передали ICrud, то и вызвать мы можем любой метод из этого интерфейса. Скажем, если это создание, то мы
+        можем вызвать метод Create. Можем даже комбинировать методы (например, изменение сделать через Delete и
+        Create (что костыль, не надо так))</p>
+    <img class="mw-100" src="{% static 'img/charp/28_interface/3_methodsininterface.png' %}"
+         alt="Возможность вызвать методы, созданные в интерфейсе"/>
+    <p>ВАЖНО - методы в ICrud не имеют реализации. Реализации будут подтягиваться из классов, которые мы туда передадим.
+        Передадим CarType - будет Create CarType-а. Передадим ComputerType - будет Create ComputerType-а. Рандомный
+        класс с методом Create мы передать не сможем, классы понимают, что связанны из-за
+        <a href="{% url 'nasled' %}" class="default-link">наследования</a> и такого понятия, как upcast. Если в
+        рандомный класс не будет имплементирован ICrud, то и вставить в метод и вызвать Create мы не сможем</p>
+    <p>Таким образом, вот такой код сначала вызовет создание и чтение для машины, а потом - для компьютера</p>
+    <div class="code-block">
+        <p class="code-text">void CreateSomeData(ICrud crudOperations)
+            {
+            &nbsp; &nbsp; Console.WriteLine("Вы запросили создание!");
+            &nbsp; &nbsp; crudOperations.Create();
+            &nbsp; &nbsp; Console.WriteLine();
+            &nbsp; &nbsp; Console.WriteLine("Итоговая таблица: ");
+            &nbsp; &nbsp; crudOperations.Read();
+            &nbsp; &nbsp; Console.WriteLine("-------------");
+            }
+
+            CarTable car = new CarTable();
+            ComputerTable comp = new ComputerTable();
+
+            CreateSomeData(car); // сначала запускаем добавление\чтение для машин
+            CreateSomeData(comp); // потом запускаем для компьютера
+        </p>
+    </div>
+    <img class="mw-100" src="{% static 'img/charp/28_interface/4_result.png' %}" alt="Результат добавления"/>
+{% endblock %}

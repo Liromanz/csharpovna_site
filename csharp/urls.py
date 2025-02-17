@@ -41,6 +41,7 @@ urlpatterns = [
 
 
     path('inheritance', v.nasled, name='nasled'),
+    path('interface', v.interface, name='interface'),
     path('enum', v.enum, name='enum'),
 
     path('tests', v.tests, name='tests'),

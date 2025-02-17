@@ -3,7 +3,7 @@
 
 
 {% block previousPage %} {% url 'threads' %} {% endblock %}
-{% block nextPage %} {% url 'enum' %} {% endblock %}
+{% block nextPage %} {% url 'interface' %} {% endblock %}
 
 
 {% block main_info %}
@@ -71,7 +71,7 @@
     <p>Мы можем делать еще более уникальные методы с родительским объектом, хотя передавать мы будем дочерние объекты.
         На примере с тем же поездом – метод принимает в себя родителя – Train, а значит мы можем передавать в этот метод
         все, что наследуется от Train – пассажирские и грузовые поезда </p>
-    <p>Такой вариант передачи называется <b>Downcast – от дочернего класса до родительского</b></p>
+    <p>Такой вариант передачи называется <b>Upcast – от дочернего класса до родительского</b></p>
     <div class="code-block">
         <p class="code-text">void ShowTrain(Train train) // передаем Train - родителя
             {
@@ -97,7 +97,7 @@
         передавать object. Однако в этом случае нам придется <a href="{% url 'transformation' %}#explict"
                                                                 class="default-link">приводить</a>
         передаваемому переменную к типу данных string </p>
-    <p>Такой вариант передачи называется <b>Upcast – от родительского класса до дочернему</b> </p>
+    <p>Такой вариант передачи называется <b>Downcast – от родительского класса до дочернего</b> </p>
     <div class="code-block">
         <p class="code-text">void ShowText(string text)
             {

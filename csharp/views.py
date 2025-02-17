@@ -155,6 +155,11 @@ def nasled(request):
     return render(request, '27_inheritance.html', context)
 
 
+def interface(request):
+    context = {'show_previous_page': True, 'show_next_page': True}
+    return render(request, '28_interface.html', context)
+
+
 def enum(request):
     context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '31_enum.html', context)
