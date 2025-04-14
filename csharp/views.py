@@ -177,5 +177,10 @@ def tests(request):
 
 
 def generics(request):
-    context = {'show_previous_page': True, 'show_next_page': False}
+    context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '33_generic.html', context)
+
+
+def this(request):
+    context = {'show_previous_page': True, 'show_next_page': False}
+    return render(request, '34_this.html', context)

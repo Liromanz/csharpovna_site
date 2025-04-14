@@ -49,4 +49,5 @@ urlpatterns = [
 
 
     path('generic', v.generics, name='generic'),
+    path('this', v.this, name='this'),
 ]
