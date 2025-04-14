@@ -169,5 +169,13 @@ def enum(request):
 
 
 def tests(request):
-    context = {'show_previous_page': True, 'show_next_page': False}
+    context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '32_tests.html', context)
+
+
+# ------------------------------------------------------------------------ Дополнительно
+
+
+def generics(request):
+    context = {'show_previous_page': True, 'show_next_page': False}
+    return render(request, '33_generic.html', context)
