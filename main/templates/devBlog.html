@@ -2,7 +2,25 @@
 {% load static %}
 
 {% block main_info %}
-    <h2>Dev-блог - все новости и нововведения на сайте</h2>
+    <div class="row">
+        <h2 class="col mb-0">Dev-блог - все новости и нововведения на сайте</h2>
+        <div class="col-xl-auto me-3 d-flex align-items-center">
+            <a href="{% url 'devblog' %}"
+               class="btn btn-success {% if not current_tag %}active{% endif %} align-middle">Сбросить
+                все фильтры</a>
+        </div>
+    </div>
+    <hr/>
+    <div class="filter-tags">
+        <p>Фильтры для поиска:
+            {% for tag in all_tags %}
+                <a href="{% url 'devblog' %}?tag={{ tag.name|urlencode }}"
+                   class="btn btn-success {% if current_tag == tag.name %}active{% endif %}">
+                    {{ tag.name }}
+                </a>
+            {% endfor %}
+        </p>
+    </div>
     <hr/>
 
     {% for newsItem in object_list %}
@@ -16,36 +34,55 @@
             </div>
             <div class="card-footer text-muted">
                 {% for tag in newsItem.tags.all %}
-                    <a href="#{{ tag }}" class="btn btn-success">{{ tag }}</a>
+                    <a href="{% url 'devblog' %}?tag={{ tag.name|urlencode }}"
+                       class="btn btn-success {% if current_tag == tag.name %}active{% endif %}">
+                        {{ tag.name }}
+                    </a>
                 {% endfor %}
             </div>
         </div>
         <br/>
+    {% empty %}
+        <p>Новостей с тегом "{{ current_tag }}" не найдено.</p>
     {% endfor %}
 
+    <!-- Пагинация -->
     {% if is_paginated %}
         <br/>
         <div class="row justify-content-md-center">
             <div class="col-auto mx-auto">
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-success"><<</a>
-                    <a href="?page=1" class="btn btn-outline-success">1</a>
+                    <a href="{% url 'devblog' %}?page=
+
+
+
+                            {{ page_obj.previous_page_number }}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
+                       class="btn btn-success"><<</a>
+                    <a href="{% url 'devblog' %}?page=1{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
+                       class="btn btn-outline-success">1</a>
                     ..
                 {% endif %}
 
                 {% for page in paginator.page_range %}
                     {% if page != paginator.num_pages and page != 1 %}
-                        <a href="?page={{ page }}" class="btn btn-outline-success">{{ page }}</a>
+                        <a href="{% url 'devblog' %}?page=
+                                {{ page }}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
+                           class="btn btn-outline-success">{{ page }}</a>
                     {% endif %}
                 {% endfor %}
 
                 {% if page_obj.has_next %}
                     ..
-                    <a href="?page={{ paginator.num_pages }}"
+                    <a href="{% url 'devblog' %}?page=
+                            {{ paginator.num_pages }}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                        class="btn btn-outline-success">{{ paginator.num_pages }}</a>
-                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-success">>></a>
-                {% endif %}
+                    <a href="{% url 'devblog' %}?page=
 
+
+
+                            {{ page_obj.next_page_number }}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
+                       class="btn btn-success">>></a>
+                {% endif %}
             </div>
         </div>
     {% endif %}

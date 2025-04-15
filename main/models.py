@@ -13,7 +13,7 @@ class Tags(models.Model):
 class News(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     tags = models.ManyToManyField(Tags)
 
     def __str__(self):
