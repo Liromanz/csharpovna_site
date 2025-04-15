@@ -13,6 +13,10 @@ class Custom404Middleware:
             # Или перенаправление:
             # from django.shortcuts import redirect
             # return redirect('home')
+        if response.status_code == 403:
+            return render(request, '403.html', status=403)
+        if response.status_code == 500:
+            return render(request, '500.html', status=500)
         return response
 
     def process_exception(self, request, exception):
