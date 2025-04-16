@@ -10,6 +10,10 @@ def index(request):
     return render(request, 'index.html', context)
 
 
+def aboutMe(request):
+    context = {'show_previous_page': False, 'show_next_page': False}
+    return render(request, 'aboutMe.html', context)
+
 class DevBlogList(ListView):
     model = News
     template_name = "devBlog.html"

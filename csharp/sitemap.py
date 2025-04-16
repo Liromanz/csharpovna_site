@@ -51,7 +51,7 @@ class MainStaticSitemap(Sitemap):
 
     def items(self):
         # Статические страницы из main/urls.py
-        return ['devblog']  # Главная и devblog
+        return ['devblog', 'aboutMe']  # Главная и devblog
 
     def location(self, item):
         return reverse(item)

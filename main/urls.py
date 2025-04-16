@@ -6,4 +6,6 @@ urlpatterns = [
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('', v.index, name='mainpage'),
     path('devblog', v.DevBlogList.as_view(), name='devblog'),
+    path('aboutMe', v.aboutMe, name='aboutMe'),
+
 ]
