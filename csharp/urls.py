@@ -42,6 +42,8 @@ urlpatterns = [
 
     path('inheritance', v.nasled, name='nasled'),
     path('interface', v.interface, name='interface'),
+    path('abstractions', v.abstractions, name='abstractions'),
+    path('polymorphism', v.polymorphism, name='polymorphism'),
     path('enum', v.enum, name='enum'),
 
 

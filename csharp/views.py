@@ -102,7 +102,7 @@ def classascontainer(request):
 
 
 def modifiers(request):
-    context = {'show_previous_page': True, 'show_next_page': True}
+    context = {'show_previous_page': False, 'show_next_page': False}
     return render(request, '19_modifiers.html', context)
 
 
@@ -158,6 +158,17 @@ def nasled(request):
 def interface(request):
     context = {'show_previous_page': True, 'show_next_page': True}
     return render(request, '28_interface.html', context)
+
+
+def abstractions(request):
+    context = {'show_previous_page': False, 'show_next_page': False}
+    return render(request, '29_abstractions.html', context)
+
+
+def polymorphism(request):
+    context = {'show_previous_page': False, 'show_next_page': False}
+    return render(request, '30_polymorphism.html', context)
+
 
 
 def enum(request):

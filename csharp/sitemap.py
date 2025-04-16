@@ -36,6 +36,8 @@ class CsharpSitemap(Sitemap):
             'threads',
             'nasled',
             'interface',
+            'abstractions',
+            'polymorphism',
             'enum',
             'tests',
             'generic',
