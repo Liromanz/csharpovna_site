@@ -1,36 +1,35 @@
 /*
     DEMO STYLE
 */
-
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
 p {
-    font-size: 1.1em;
-    font-weight: 300;
-    line-height: 1.7em;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+  font-size: 1.1em;
+  font-weight: 300;
+  line-height: 1.7em;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 a,
 a:hover,
 a:focus {
-    color: inherit;
-    text-decoration: none;
-    transition: all 0.3s;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s;
 }
 
 .navbar-btn {
-    box-shadow: none;
-    outline: none !important;
-    border: none;
+  box-shadow: none;
+  outline: none !important;
+  border: none;
 }
 
 .line {
-    width: 100%;
-    height: 1px;
-    border-bottom: 1px dashed #ffffff;
-    margin: 40px 0;
+  width: 100%;
+  height: 1px;
+  border-bottom: 1px dashed #ffffff;
+  margin: 40px 0;
 }
 
 /* ---------------------------------------------------
@@ -38,94 +37,90 @@ a:focus {
 ----------------------------------------------------- */
 
 .wrapper {
-    display: flex;
-    width: 100%;
-    align-items: stretch;
+  display: flex;
+  width: 100%;
+  align-items: stretch;
 }
 
 #sidebar {
-    min-width: 250px;
-    max-width: 250px;
-    background: #202d1d;
-    color: #fff;
-    transition: all 0.3s;
-}
-
-#sidebar.active {
-    margin-left: -250px;
+  min-width: 250px;
+  max-width: 250px;
+  background: #202d1d;
+  color: #fff;
+  transition: all 0.3s;
 }
 
 #sidebar .sidebar-header {
-    padding: 20px;
-    background: #93cc6d;
+  padding: 20px;
+  background: #93cc6d;
 }
 
 #sidebar ul.components {
-    padding: 20px 0;
-    border-bottom: 1px solid #6c8b47;
+  padding: 20px 0;
+  border-bottom: 1px solid #6c8b47;
 }
 
 #sidebar ul p {
-    color: #fff;
-    padding: 10px;
+  color: #fff;
+  padding: 10px;
 }
 
 #sidebar ul li a {
-    padding: 10px;
-    font-size: 1.1em;
-    display: block;
+  padding: 10px;
+  font-size: 1.1em;
+  display: block;
 }
 
 #sidebar ul li a:hover {
-    color: #ffffff;
-    background: #819f6c;
+  color: #ffffff;
+  background: #819f6c;
 }
 
-#sidebar ul li.active>a,
+#sidebar ul li.active > a,
 a[aria-expanded="true"] {
-    color: #fff;
-    background: #597c42;
+  color: #fff;
+  background: #597c42;
 }
 
 a[data-toggle="collapse"] {
-    position: relative;
+  position: relative;
 }
 
 .dropdown-toggle::after {
-    display: block;
-    position: absolute;
-    top: 50%;
-    right: 20px;
-    transform: translateY(-50%);
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
 }
 
 ul ul a {
-    font-size: 0.9em !important;
-    padding-left: 30px !important;
-    background: #38442d;
+  font-size: 0.9em !important;
+  padding-left: 30px !important;
+  background: #38442d;
 }
 
 ul.CTAs {
-    padding: 20px;
+  padding: 20px;
 }
 
 ul.CTAs a {
-    text-align: center;
-    font-size: 0.9em !important;
-    display: block;
-    border-radius: 5px;
-    margin-bottom: 5px;
+  text-align: center;
+  font-size: 0.9em !important;
+  display: block;
+  border-radius: 5px;
+  margin-bottom: 5px;
 }
 
 a.download {
-    background: #fff;
-    color: #93cc6d;
+  background: #fff;
+  color: #93cc6d;
 }
 
 a.article,
 a.article:hover {
-    background: #93cc6d !important;
-    color: #fff !important;
+  background: #93cc6d !important;
+  color: #fff !important;
 }
 
 /* ---------------------------------------------------
@@ -133,23 +128,84 @@ a.article:hover {
 ----------------------------------------------------- */
 
 #content {
-    width: 100%;
-    min-height: 100vh;
-    transition: all 0.3s;
+  width: 100%;
+  min-height: 100vh;
+  transition: all 0.3s;
+}
+
+
+/* Стили для оверлея */
+#overlay {
+  display: none;
 }
 
 /* ---------------------------------------------------
     MEDIAQUERIES
 ----------------------------------------------------- */
 
+/* Десктоп: меню открыто по умолчанию */
+@media (min-width: 769px) {
+  #sidebar {
+    position: relative;
+    margin-left: 0; /* Меню видно */
+  }
+
+  #sidebar.active {
+    margin-left: -250px; /* Скрываем при .active */
+  }
+
+  #content {
+    width: 100%; /* Flex управляет шириной */
+  }
+
+  #content.active {
+    width: 100%;
+  }
+
+  #sidebarCollapse {
+    display: block; /* Кнопка видна */
+  }
+
+  #overlay {
+    display: none; /* Оверлей не нужен */
+  }
+}
+
+/* Мобильные: меню скрыто, выезжает поверх */
 @media (max-width: 768px) {
-    #sidebar {
-        margin-left: -250px;
-    }
-    #sidebar.active {
-        margin-left: 0;
-    }
-    #sidebarCollapse span {
-        display: none;
-    }
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100vh;
+    z-index: 1000;
+    margin-left: 0;
+  }
+
+  #sidebar.active {
+    left: 0; /* Показываем меню */
+  }
+
+  #content {
+    width: 100%;
+  }
+
+  #content.active {
+    width: 100%;
+  }
+
+  #sidebarCollapse {
+    display: block;
+  }
+
+  #overlay.active {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
 }
