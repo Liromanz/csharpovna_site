@@ -1,0 +1,77 @@
+---
+import "@/styles/global.css";
+import Sidebar from "@/components/Sidebar.astro";
+import Header from "@/components/Header.astro";
+import SEO from "@/components/SEO.astro";
+import { detectSection, type SectionId } from "@/data/sections";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: "website" | "article";
+  ogImage?: string;
+  keywords?: string[];
+  publishedTime?: Date;
+  jsonLd?: Record<string, unknown>;
+  /** Если undefined — автоопределение по pathname. */
+  section?: SectionId;
+  /** slug текущего урока — для подсветки в sidebar. */
+  currentSlug?: string;
+  /** Скрыть боковое меню (например, на /about, /admin). */
+  hideSidebar?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogType,
+  ogImage,
+  keywords,
+  publishedTime,
+  jsonLd,
+  section,
+  currentSlug,
+  hideSidebar = false,
+} = Astro.props;
+
+const currentSection: SectionId = section ?? detectSection(Astro.url.pathname);
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#202d1d" />
+    <link rel="icon" href="/favicon.ico" />
+    <SEO
+      title={title}
+      description={description}
+      ogType={ogType}
+      ogImage={ogImage}
+      keywords={keywords}
+      publishedTime={publishedTime}
+      jsonLd={jsonLd}
+    />
+    <slot name="head" />
+  </head>
+  <body class="min-h-screen">
+    <div class="flex min-h-screen">
+      {!hideSidebar && (
+        <Sidebar currentSection={currentSection} currentSlug={currentSlug} />
+      )}
+
+      <div class="flex min-w-0 flex-1 flex-col">
+        <Header currentSection={currentSection} />
+
+        <main class="flex-1">
+          <slot />
+        </main>
+
+        <footer class="mt-12 border-t border-[var(--color-card-border)] py-6 text-center text-sm text-white/60">
+          <p>© {new Date().getFullYear()} CodeDocSS — база знаний по C#.NET</p>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>

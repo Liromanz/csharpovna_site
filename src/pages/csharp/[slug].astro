@@ -1,0 +1,19 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import LessonLayout from "@/layouts/LessonLayout.astro";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("csharp");
+  return entries.map((entry) => ({ params: { slug: entry.slug } }));
+}
+
+const { slug } = Astro.params;
+const entry = await getEntry("csharp", slug as string);
+if (!entry) return Astro.redirect("/404");
+
+const { Content, headings } = await entry.render();
+---
+
+<LessonLayout entry={entry} headings={headings} section="csharp">
+  <Content />
+</LessonLayout>

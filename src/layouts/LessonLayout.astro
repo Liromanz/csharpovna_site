@@ -1,0 +1,63 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { MarkdownHeading } from "astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import TableOfContents from "@/components/TableOfContents.astro";
+import PrevNextNav from "@/components/PrevNextNav.astro";
+import { lessonNeighbours } from "@/lib/lessons";
+import { articleJsonLd } from "@/lib/seo";
+import type { SectionId } from "@/data/sections";
+
+interface Props {
+  entry: CollectionEntry<"csharp"> | CollectionEntry<"wpf"> | CollectionEntry<"java">;
+  headings: MarkdownHeading[];
+  section: SectionId;
+}
+
+const { entry, headings, section } = Astro.props;
+const { title, description, group, placeholder, keywords } = entry.data;
+const slug = entry.slug;
+
+const { previous, next } = lessonNeighbours(section, slug);
+const url = new URL(Astro.url.pathname, Astro.site).toString();
+
+const jsonLd = articleJsonLd({
+  type: "TechArticle",
+  headline: title,
+  description,
+  url,
+});
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogType="article"
+  keywords={keywords}
+  section={section}
+  currentSlug={slug}
+  jsonLd={jsonLd}
+>
+  <article class="prose-lesson mx-auto max-w-3xl px-4 py-8">
+    <header class="mb-6 border-b border-[var(--color-card-border)] pb-4">
+      <p class="m-0 text-sm uppercase tracking-wide text-white/60">{group}</p>
+      <h1 class="mt-2">{title}</h1>
+    </header>
+
+    {placeholder ? (
+      <section>
+        <p class="rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-4">
+          На этой странице пока ничего нет. В будущем здесь появится материал по теме «{title}».
+          А пока вы можете ознакомиться с другими статьями раздела.
+        </p>
+      </section>
+    ) : (
+      <>
+        <TableOfContents headings={headings} />
+        <slot />
+      </>
+    )}
+
+    <PrevNextNav previous={previous} next={next} />
+  </article>
+</BaseLayout>

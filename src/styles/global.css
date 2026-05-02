@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/* Design tokens — палитра один-в-один с текущим codedocss.ru */
+@theme {
+  --color-bg: #2b2b2b;
+  --color-fg: #d0d0d0;
+  --color-link: #60c25d;
+  --color-link-hover: #93cc6d;
+
+  --color-sidebar: #202d1d;
+  --color-sidebar-header: #93cc6d;
+  --color-sidebar-hover: #819f6c;
+  --color-sidebar-active: #597c42;
+  --color-sidebar-submenu: #38442d;
+  --color-sidebar-border: #6c8b47;
+  --color-sidebar-fg: #ffffff;
+
+  --color-card-bg: #1f1f1f;
+  --color-card-border: #3a3a3a;
+
+  --color-code-bg: #222222;
+  --color-code-fg: #ffffff;
+
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  --color-success: #198754;
+  --color-danger: #dc3545;
+
+  --font-sans:
+    "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    "Cascadia Code", "JetBrains Mono", "Fira Code", ui-monospace, "SFMono-Regular", Menlo,
+    Consolas, monospace;
+
+  --spacing-sidebar: 250px;
+  --spacing-header: 60px;
+}
+
+/* Базовый сброс/тема */
+html,
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+main p {
+  line-height: 1.7;
+}
+
+/* Якоря заголовков от rehype-autolink-headings */
+.heading-anchor {
+  margin-left: 0.4em;
+  opacity: 0;
+  color: var(--color-link);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+  font-weight: 400;
+}
+h1:hover .heading-anchor,
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor,
+h5:hover .heading-anchor,
+h6:hover .heading-anchor {
+  opacity: 0.6;
+}
+.heading-anchor:hover {
+  opacity: 1 !important;
+  text-decoration: none;
+}
+
+/* Чтобы клик на якорь не приводил под sticky-header */
+:is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: calc(var(--spacing-header) + 1rem);
+}
+
+/* Sidebar scrollbar — стилизованный под тёмную тему (фикс бага №5) */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-sidebar-active) var(--color-sidebar);
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: var(--color-sidebar);
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-sidebar-active);
+  border-radius: 4px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sidebar-hover);
+}
+
+/* Контентные стили внутри LessonLayout (markdown-вывод) */
+.prose-lesson :is(h1, h2, h3, h4) {
+  color: var(--color-link-hover);
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 1.6em;
+  margin-bottom: 0.6em;
+}
+.prose-lesson h1 {
+  font-size: 2rem;
+  margin-top: 0;
+}
+.prose-lesson h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--color-card-border);
+  padding-bottom: 0.3em;
+}
+.prose-lesson h3 {
+  font-size: 1.25rem;
+}
+.prose-lesson p,
+.prose-lesson li {
+  font-size: 1rem;
+}
+.prose-lesson ul,
+.prose-lesson ol {
+  padding-left: 1.5rem;
+  margin: 1em 0;
+}
+.prose-lesson li {
+  margin: 0.4em 0;
+}
+.prose-lesson img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 6px;
+  display: block;
+}
+.prose-lesson :is(strong, b) {
+  color: #ffffff;
+  font-weight: 600;
+}
+.prose-lesson code:not(pre code) {
+  background: var(--color-code-bg);
+  color: var(--color-code-fg);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: var(--font-mono);
+}
+
+/* Загрузка Poppins */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/poppins/v22/pxiByp8kv8JHgFVrLDz8Z11lFc-K.woff2") format("woff2");
+}

@@ -1,0 +1,33 @@
+---
+import type { LessonNeighbour } from "@/lib/lessons";
+
+interface Props {
+  previous: LessonNeighbour | null;
+  next: LessonNeighbour | null;
+}
+
+const { previous, next } = Astro.props;
+---
+
+{(previous || next) && (
+  <nav class="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Навигация по урокам">
+    {previous ? (
+      <a
+        href={previous.href}
+        class="flex flex-col rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-4 text-left transition-colors hover:border-[var(--color-link)] hover:no-underline"
+      >
+        <span class="text-xs uppercase tracking-wide text-white/60">← Предыдущий урок</span>
+        <span class="mt-1 text-sm text-[var(--color-link)]">{previous.label}</span>
+      </a>
+    ) : <div></div>}
+    {next ? (
+      <a
+        href={next.href}
+        class="flex flex-col rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-4 text-right transition-colors hover:border-[var(--color-link)] hover:no-underline sm:col-start-2"
+      >
+        <span class="text-xs uppercase tracking-wide text-white/60">Следующий урок →</span>
+        <span class="mt-1 text-sm text-[var(--color-link)]">{next.label}</span>
+      </a>
+    ) : <div></div>}
+  </nav>
+)}

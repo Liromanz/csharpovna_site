@@ -1,0 +1,77 @@
+---
+import { sections, type SectionId } from "@/data/sections";
+
+interface Props {
+  currentSection: SectionId;
+  currentSlug?: string;
+}
+
+const { currentSection, currentSlug } = Astro.props;
+const section = sections[currentSection];
+---
+
+<nav
+  id="sidebar"
+  class="sidebar-scroll fixed inset-y-0 left-0 z-40 w-[var(--spacing-sidebar)] -translate-x-full overflow-y-auto bg-[var(--color-sidebar)] text-[var(--color-sidebar-fg)] transition-transform duration-300 data-[open=true]:translate-x-0 md:sticky md:top-0 md:h-screen md:translate-x-0"
+  aria-label="Навигация раздела"
+>
+  <div class="px-4 py-5">
+    <h2 class="text-center text-lg font-semibold text-[var(--color-sidebar-header)]">
+      {currentSection === "csharp" && "C# — базовые структуры"}
+      {currentSection === "wpf" && "WPF"}
+      {currentSection === "java" && "Java"}
+    </h2>
+    <hr class="my-3 border-[var(--color-sidebar-border)]" />
+
+    {section.status === "coming-soon" ? (
+      <p class="px-2 py-3 text-sm leading-relaxed opacity-80">{section.comingSoonText}</p>
+    ) : (
+      <ul class="list-none space-y-1 p-0">
+        {section.groups.map((group) => (
+          <li>
+            <details
+              class="group rounded"
+              open={!!currentSlug && group.items.some((it) => it.slug === currentSlug)}
+            >
+              <summary
+                class="flex cursor-pointer select-none items-center justify-between rounded px-3 py-2 text-[1rem] font-medium hover:bg-[var(--color-sidebar-hover)]"
+              >
+                <span>{group.title}</span>
+                <span class="ml-2 text-xs opacity-70 group-open:rotate-90 transition-transform">▶</span>
+              </summary>
+              <ul class="mt-1 list-none space-y-0.5 bg-[var(--color-sidebar-submenu)] py-1 pl-3 pr-1">
+                {group.items.map((item) => {
+                  const href = `${section.basePath}/${item.slug}`;
+                  const isActive = item.slug === currentSlug;
+                  return (
+                    <li>
+                      <a
+                        href={href}
+                        class:list={[
+                          "block rounded px-3 py-1.5 text-sm leading-snug",
+                          isActive
+                            ? "bg-[var(--color-sidebar-active)] font-semibold text-white"
+                            : "text-white/90 hover:bg-[var(--color-sidebar-hover)]",
+                          item.placeholder && "opacity-70",
+                        ]}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </details>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</nav>
+
+<div
+  id="sidebar-overlay"
+  class="fixed inset-0 z-30 hidden bg-[var(--color-overlay)] data-[open=true]:block md:!hidden"
+  aria-hidden="true"
+></div>
