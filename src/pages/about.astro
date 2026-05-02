@@ -1,0 +1,187 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const skills = [
+  "Руководство командой",
+  "Разработка и оптимизация программного обеспечения",
+  "Веб-разработка",
+  "Проектирование архитектуры",
+  "Анализ бизнес-процессов",
+  "Работа по Agile-методологиям",
+  "Преподавание и публичные выступления",
+  "Барменство (ну а вдруг)",
+];
+
+const tools = [
+  "C#, .NET, WinForms, WPF, MAUI, Avalonia, ASP.NET",
+  "Python, Django",
+  "REST-API, GraphQL",
+  "MSSQL, PostgreSQL, MySQL, SQLite",
+  "Git, Microsoft Azure, Yandex Cloud, TimeWeb",
+  "BPMN, IDEF1, UML, Канва бизнес-моделей",
+];
+
+const experience = [
+  {
+    period: "Октябрь 2024 — н.в.",
+    company: 'АО "Иридиум"',
+    role: "Team-lead C#/.NET разработки",
+    summary: "Руководитель Windows-команды разработки почтового клиента.",
+    points: [
+      ["Разработка приложения WinForms", "Организация команды"],
+      ["Работа с почтовыми протоколами", "Планирование целей продукта"],
+      ["Разработка и внедрение модулей", "Менторство"],
+      ["Контроль релизов приложения", "Прототипирование функционала"],
+    ],
+  },
+  {
+    period: "Июль 2024 — Сентябрь 2024",
+    company: "Ecoplatform",
+    role: "C#/.NET разработчик",
+    summary:
+      "Проектная деятельность — разработка приложения для взвешивания мешков и автоматической отправки данных на сервер.",
+    points: [
+      ["Разработка WPF-приложения", "Работа с API"],
+      ["Передача данных через COM Port", "Поддержка проекта"],
+    ],
+  },
+  {
+    period: "Март 2022 — Сентябрь 2024",
+    company: "IT-компании и вуз",
+    role: "Junior-Middle C#/.NET разработчик, преподаватель",
+    summary:
+      'Разработчик Desktop-приложений на микросервисной архитектуре, преподаватель дисциплины «Основы алгоритмизации и программирования».',
+    points: [
+      ["Внедрение новых модулей в API", "Написание лекционного материала"],
+      ["Бесшовная интеграция модулей", "Менторство и частное обучение"],
+      ["Локализация приложений", "Написание технической документации"],
+      ["UI разработка, Backend разработка", "Лекторство"],
+    ],
+  },
+];
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "София Скорогудаева",
+  jobTitle: "Team Lead C#/.NET",
+  email: "mailto:sofia.skorogudaeva@mail.ru",
+  url: "https://codedocss.ru/about",
+  sameAs: ["https://github.com/liromanz"],
+};
+---
+
+<BaseLayout
+  title="Обо мне — София Скорогудаева, C#/.NET разработчик"
+  description="Автор сайта CodeDocSS — София Скорогудаева, Team Lead C#/.NET разработки. Преподаватель C#, опыт с WPF, WinForms, ASP.NET, MAUI и Avalonia."
+  ogType="article"
+  keywords={["автор", "C# разработчик", "C# преподаватель", ".NET разработка"]}
+  jsonLd={personJsonLd}
+>
+  <div class="mx-auto max-w-4xl px-4 py-8">
+    <header class="flex flex-col items-start justify-between gap-4 border-b border-[var(--color-card-border)] pb-6 lg:flex-row lg:items-center">
+      <div class="flex items-center gap-4">
+        <img
+          src="/img/safika.png"
+          alt="София Скорогудаева"
+          width="80"
+          height="80"
+          class="h-20 w-20 rounded-full border-2 border-[var(--color-success)]"
+        />
+        <div>
+          <h1 class="m-0 text-2xl font-bold">София Скорогудаева</h1>
+          <p class="m-0 mt-1 text-[var(--color-link)]">Team Lead C#/.NET разработки</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1 text-sm">
+        <a href="mailto:sofia.skorogudaeva@mail.ru" class="inline-flex items-center gap-2">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 2A2 2 0 0 0 .05 3.555L8 8.414l7.95-4.859A2 2 0 0 0 14 2zm-2 9.8V4.698l5.803 3.546zm6.761-2.97-6.57 4.026A2 2 0 0 0 2 14h12a2 2 0 0 0 1.81-1.144l-6.57-4.026L8 9.586z"/>
+          </svg>
+          <span class="text-white">sofia.skorogudaeva@mail.ru</span>
+        </a>
+        <a href="https://github.com/liromanz" rel="noopener" target="_blank" class="inline-flex items-center gap-2">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+          </svg>
+          <span class="text-white">Liromanz</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="prose-lesson mt-6">
+      <h2 class="text-[var(--color-link)]">Обо мне</h2>
+      <p>
+        <strong>Я — C# разработчик и Team Lead</strong>, который любит и технологии и работу с
+        людьми. В работе стремлюсь создавать понятный и единый контекст общения, объясняя
+        сложные технические решения простым языком — как для тех, кто далёк от разработки,
+        так и для опытных специалистов. С красным дипломом окончила своё образовательное
+        учреждение и в данный момент совмещаю руководство командой с разработкой, не забывая
+        ни про один аспект каждой из областей.
+      </p>
+      <p>
+        Меня увлекает не только техническая сторона проектов, но и их бизнес-составляющая:
+        параллельно с развитием кодовой базы изучаю бизнес-анализ и процессы управления
+        проектами.
+      </p>
+      <p>
+        Также преподавала C# в вузе, накопив богатый лекционный материал, которым теперь
+        хочу поделиться. Моя цель — создавать продукты, которые приносят пользу, и делиться
+        знаниями с открытостью и энтузиазмом.
+      </p>
+      <p>А ещё я не особо слежу за гитом 😅</p>
+    </section>
+
+    <section class="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
+      <div>
+        <h2 class="m-0 mb-3 text-2xl font-bold text-[var(--color-link)]">Навыки</h2>
+        <ul class="list-none space-y-2 border-t border-[var(--color-card-border)] pt-3">
+          {skills.map((s) => (
+            <li class="flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-[var(--color-success)]"></span>
+              <span>{s}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h2 class="m-0 mb-3 text-2xl font-bold text-[var(--color-link)]">Инструментарий</h2>
+        <ul class="list-none space-y-2 border-t border-[var(--color-card-border)] pt-3">
+          {tools.map((t) => (
+            <li class="flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-[var(--color-success)]"></span>
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="mt-10">
+      <h2 class="m-0 mb-3 text-2xl font-bold text-[var(--color-link)]">Опыт работы</h2>
+      <div class="space-y-6 border-t border-[var(--color-card-border)] pt-3">
+        {experience.map((job) => (
+          <article class="grid grid-cols-1 gap-4 md:grid-cols-[12rem_1fr]">
+            <div>
+              <h3 class="m-0 text-lg font-bold">{job.period}</h3>
+              <p class="mt-1 text-sm text-white/70">{job.company}</p>
+            </div>
+            <div class="relative md:border-l-2 md:border-[var(--color-success)] md:pl-6">
+              <span class="absolute -left-2 top-0 hidden h-4 w-4 rounded-full bg-[var(--color-success)] md:block" aria-hidden="true"></span>
+              <h4 class="m-0 text-lg font-bold text-[var(--color-link)]">{job.role}</h4>
+              <p class="mt-2">{job.summary}</p>
+              <div class="mt-3 grid grid-cols-1 gap-x-6 gap-y-1 sm:grid-cols-2">
+                {job.points.flat().map((p) => (
+                  <div class="flex items-center gap-2 text-sm">
+                    <span class="h-2 w-2 rounded-full bg-[var(--color-success)]"></span>
+                    <span>{p}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>

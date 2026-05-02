@@ -1,0 +1,37 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="404 — страница не найдена"
+  description="Запрошенная страница не найдена. Перейдите на главную или в dev-блог."
+>
+  <article class="prose-lesson mx-auto max-w-2xl px-4 py-16 text-center">
+    <h1 class="text-5xl">404</h1>
+    <p class="text-xl">Запрошенная страница не найдена.</p>
+    <p>
+      Возможно, она была перенесена или ещё не создана. Попробуйте начать
+      с одного из путей ниже.
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a
+        href="/"
+        class="rounded-md bg-[var(--color-success)] px-4 py-2 font-medium text-white hover:no-underline hover:opacity-90"
+      >
+        На главную
+      </a>
+      <a
+        href="/csharp/variables"
+        class="rounded-md border border-[var(--color-link)] px-4 py-2 font-medium text-[var(--color-link)] hover:no-underline hover:bg-white/5"
+      >
+        К урокам C#
+      </a>
+      <a
+        href="/devblog/"
+        class="rounded-md border border-[var(--color-link)] px-4 py-2 font-medium text-[var(--color-link)] hover:no-underline hover:bg-white/5"
+      >
+        В dev-блог
+      </a>
+    </div>
+  </article>
+</BaseLayout>
