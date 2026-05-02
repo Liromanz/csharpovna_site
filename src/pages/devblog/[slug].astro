@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import EngagementBar from "@/components/EngagementBar.astro";
 import { formatDateRu, getPostBySlug } from "@/lib/blog";
 import { articleJsonLd } from "@/lib/seo";
 
@@ -90,6 +91,8 @@ const jsonLd = articleJsonLd({
     </header>
 
     <div class="prose-lesson space-y-4" set:html={html}></div>
+
+    <EngagementBar slug={`blog/${post.slug}`} />
 
     <footer class="mt-10 border-t border-[var(--color-card-border)] pt-4">
       <a href="/devblog/" class="text-sm text-[var(--color-link)] hover:underline">

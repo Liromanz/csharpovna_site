@@ -1,0 +1,29 @@
+---
+import Paywall from "@/components/quiz/Paywall.astro";
+
+interface Props {
+  /** Уникальный id вопроса в рамках урока (для отправки на /api/quiz/check). */
+  id: string;
+  /** Канонический slug урока, например "csharp/if". Если не задан — берётся из URL. */
+  lessonSlug?: string;
+}
+
+const { id, lessonSlug } = Astro.props;
+const slug = lessonSlug ?? Astro.url.pathname.replace(/^\/+|\/+$/g, "");
+
+const isSubscriber = (Astro.locals as App.Locals)?.user?.isSubscriber === true;
+---
+
+{!isSubscriber ? (
+  <Paywall />
+) : (
+  <section
+    class="my-6 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-4"
+    data-quiz
+    data-quiz-id={id}
+    data-quiz-slug={slug}
+    aria-label="Проверка знаний"
+  >
+    <slot />
+  </section>
+)}

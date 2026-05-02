@@ -4,6 +4,7 @@ import type { MarkdownHeading } from "astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import TableOfContents from "@/components/TableOfContents.astro";
 import PrevNextNav from "@/components/PrevNextNav.astro";
+import EngagementBar from "@/components/EngagementBar.astro";
 import { lessonNeighbours } from "@/lib/lessons";
 import { articleJsonLd } from "@/lib/seo";
 import type { SectionId } from "@/data/sections";
@@ -15,8 +16,9 @@ interface Props {
 }
 
 const { entry, headings, section } = Astro.props;
-const { title, description, group, placeholder, keywords } = entry.data;
+const { title, description, group, placeholder, keywords, engagement } = entry.data;
 const slug = entry.slug;
+const engagementSlug = `${section}/${slug}`;
 
 const { previous, next } = lessonNeighbours(section, slug);
 const url = new URL(Astro.url.pathname, Astro.site).toString();
@@ -57,6 +59,8 @@ const jsonLd = articleJsonLd({
         <slot />
       </>
     )}
+
+    {!placeholder && engagement && <EngagementBar slug={engagementSlug} />}
 
     <PrevNextNav previous={previous} next={next} />
   </article>

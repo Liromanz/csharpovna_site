@@ -1,0 +1,122 @@
+---
+interface Props {
+  /** Канонический slug урока/поста, например "csharp/variables" или "blog/dobavlena-stranitsa-avtora" */
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<div
+  class="mt-8 flex items-center gap-4 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-4"
+  data-engagement
+  data-slug={slug}
+>
+  <button
+    type="button"
+    data-engagement-like
+    class="inline-flex items-center gap-2 rounded-md border border-[var(--color-card-border)] px-3 py-1.5 text-sm transition-colors hover:bg-white/5 disabled:opacity-60"
+    aria-label="Поставить лайк"
+  >
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+    <span data-engagement-likes>—</span>
+  </button>
+
+  <span class="text-sm text-white/60" aria-label="Количество просмотров">
+    <svg class="mr-1 inline-block h-4 w-4 align-text-bottom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+    <span data-engagement-views>—</span> просмотров
+  </span>
+</div>
+
+<script>
+  const STORAGE_KEY = "codedocss-fingerprint";
+
+  function getFingerprint(): string {
+    try {
+      let fp = localStorage.getItem(STORAGE_KEY);
+      if (!fp) {
+        // Случайный 32-символьный hex
+        fp = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        localStorage.setItem(STORAGE_KEY, fp);
+      }
+      return fp;
+    } catch {
+      return "anon";
+    }
+  }
+
+  async function init() {
+    const root = document.querySelector<HTMLElement>("[data-engagement]");
+    if (!root) return;
+    const slug = root.dataset.slug ?? "";
+    if (!slug) return;
+
+    const likesEl = root.querySelector<HTMLElement>("[data-engagement-likes]");
+    const viewsEl = root.querySelector<HTMLElement>("[data-engagement-views]");
+    const likeBtn = root.querySelector<HTMLButtonElement>("[data-engagement-like]");
+
+    const fp = getFingerprint();
+
+    // Засчитываем просмотр + получаем актуальные счётчики
+    try {
+      const viewRes = await fetch("/api/view", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ slug, fingerprint: fp }),
+      });
+      if (viewRes.ok) {
+        const data = await viewRes.json();
+        if (viewsEl && typeof data.views === "number") viewsEl.textContent = String(data.views);
+      }
+
+      const statsRes = await fetch(`/api/stats/${encodeURIComponent(slug)}`);
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        if (viewsEl && typeof data.views === "number") viewsEl.textContent = String(data.views);
+        if (likesEl && typeof data.likes === "number") likesEl.textContent = String(data.likes);
+      }
+    } catch (e) {
+      console.warn("engagement init failed", e);
+    }
+
+    likeBtn?.addEventListener("click", async () => {
+      if (likeBtn.disabled) return;
+      likeBtn.disabled = true;
+      try {
+        const res = await fetch("/api/like", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ slug, fingerprint: fp }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (likesEl && typeof data.likes === "number") likesEl.textContent = String(data.likes);
+          if (data.alreadyLiked) {
+            likeBtn.setAttribute("aria-pressed", "true");
+            likeBtn.classList.add("bg-[var(--color-success)]/15");
+          } else {
+            likeBtn.setAttribute("aria-pressed", "true");
+            likeBtn.classList.add("bg-[var(--color-success)]/15");
+          }
+        }
+      } catch (e) {
+        console.warn("like failed", e);
+      } finally {
+        likeBtn.disabled = false;
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+</script>
