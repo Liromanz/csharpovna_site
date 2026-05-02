@@ -1,0 +1,100 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { formatDateRu, getPostBySlug } from "@/lib/blog";
+import { articleJsonLd } from "@/lib/seo";
+
+const slug = Astro.params.slug;
+if (!slug) return Astro.redirect("/404", 404);
+
+const post = await getPostBySlug(slug);
+if (!post) return Astro.redirect("/404", 404);
+
+// Простой рендер plain-text → HTML: разбиение на параграфы по \n\n
+// Внутри параграфа \n превращается в <br>. URL автоматически становятся ссылками.
+function renderContent(text: string): string {
+  const escapeHtml = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  const linkify = (s: string): string => {
+    const escaped = escapeHtml(s);
+    // /csharp/foo, /devblog, /about — внутренние ссылки
+    return escaped.replace(/(\/[a-zA-Z0-9_/-]+)/g, (m) => {
+      // Пропускаем тривиальные одиночные слэши
+      if (m.length < 4) return m;
+      return `<a href="${m}" class="text-[var(--color-link)] hover:underline">${m}</a>`;
+    });
+  };
+
+  return text
+    .split(/\n\n+/)
+    .map((para) => {
+      // Списки: строка, начинающаяся с "- "
+      const lines = para.split("\n");
+      const isList = lines.every((l) => l.trim().startsWith("- "));
+      if (isList) {
+        return (
+          "<ul class=\"list-disc pl-6 space-y-1\">" +
+          lines.map((l) => `<li>${linkify(l.replace(/^- /, ""))}</li>`).join("") +
+          "</ul>"
+        );
+      }
+      return `<p>${lines.map(linkify).join("<br />")}</p>`;
+    })
+    .join("\n");
+}
+
+const html = renderContent(post.content);
+const url = new URL(Astro.url.pathname, Astro.site).toString();
+const jsonLd = articleJsonLd({
+  type: "BlogPosting",
+  headline: post.title,
+  description: post.description,
+  url,
+  datePublished: post.date,
+});
+---
+
+<BaseLayout
+  title={post.title}
+  description={post.description}
+  ogType="article"
+  publishedTime={post.date}
+  jsonLd={jsonLd}
+>
+  <article class="mx-auto max-w-3xl px-4 py-8">
+    <header class="mb-6 border-b border-[var(--color-card-border)] pb-4">
+      <p class="m-0 text-sm text-white/60">
+        <a href="/devblog/" class="hover:underline">← Dev-блог</a>
+      </p>
+      <h1 class="mt-2 text-3xl font-bold">{post.title}</h1>
+      <p class="mt-3 flex flex-wrap items-center gap-2 text-sm text-white/60">
+        <time datetime={post.date.toISOString()}>{formatDateRu(post.date)}</time>
+        {post.tags.length > 0 && (
+          <>
+            <span>·</span>
+            <span class="flex flex-wrap gap-1.5">
+              {post.tags.map((tag) => (
+                <a
+                  href={`/devblog/?tag=${encodeURIComponent(tag.name)}`}
+                  class="rounded-full border border-[var(--color-card-border)] px-2 py-0.5 text-xs text-white/85 hover:bg-white/5 hover:no-underline"
+                >
+                  {tag.name}
+                </a>
+              ))}
+            </span>
+          </>
+        )}
+      </p>
+    </header>
+
+    <div class="prose-lesson space-y-4" set:html={html}></div>
+
+    <footer class="mt-10 border-t border-[var(--color-card-border)] pt-4">
+      <a href="/devblog/" class="text-sm text-[var(--color-link)] hover:underline">
+        ← Все записи
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

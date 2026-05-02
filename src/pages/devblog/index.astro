@@ -1,0 +1,26 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BlogIndex from "@/components/BlogIndex.astro";
+import { listAllTags, listPosts } from "@/lib/blog";
+
+const tagParam = Astro.url.searchParams.get("tag");
+const activeTag = tagParam && tagParam.length > 0 ? tagParam : null;
+
+const [paginated, allTags] = await Promise.all([
+  listPosts({ page: 1, tag: activeTag }),
+  listAllTags(),
+]);
+
+const titleSuffix = activeTag ? ` — ${activeTag}` : "";
+---
+
+<BaseLayout
+  title={`Dev-блог${titleSuffix}`}
+  description="Dev-блог автора сайта CodeDocSS. Анонсы новых статей по C#, обновления и планы."
+  ogType="website"
+  keywords={["dev-блог", "C#", "новости", "обновления"]}
+>
+  <BlogIndex paginated={paginated} allTags={allTags} activeTag={activeTag} />
+</BaseLayout>

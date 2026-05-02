@@ -1,0 +1,79 @@
+---
+interface Props {
+  currentPage: number;
+  pageCount: number;
+  /** Базовый путь без trailing slash, например "/devblog". Page 1 → "{basePath}/", page N → "{basePath}/page/N/" */
+  basePath: string;
+  /** Доп. query-string без `?`, например "tag=Статьи" */
+  query?: string;
+}
+
+const { currentPage, pageCount, basePath, query } = Astro.props;
+const qs = query ? `?${query}` : "";
+
+function linkFor(page: number): string {
+  const path = page <= 1 ? `${basePath}/` : `${basePath}/page/${page}/`;
+  return `${path}${qs}`;
+}
+
+// Какие номера страниц показываем — стараемся не плодить гигантские списки.
+function visiblePages(current: number, count: number): (number | "…")[] {
+  if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1);
+  const set = new Set<number>([1, count, current, current - 1, current + 1]);
+  const list = Array.from(set).filter((n) => n >= 1 && n <= count).sort((a, b) => a - b);
+  const out: (number | "…")[] = [];
+  for (let i = 0; i < list.length; i++) {
+    out.push(list[i]!);
+    if (i < list.length - 1 && list[i + 1]! - list[i]! > 1) out.push("…");
+  }
+  return out;
+}
+
+const visible = visiblePages(currentPage, pageCount);
+---
+
+{pageCount > 1 && (
+  <nav class="mt-8 flex items-center justify-center gap-1" aria-label="Пагинация блога">
+    {currentPage > 1 ? (
+      <a
+        href={linkFor(currentPage - 1)}
+        class="rounded-md border border-[var(--color-card-border)] px-3 py-1.5 text-sm hover:bg-white/5 hover:no-underline"
+        rel="prev"
+      >
+        ‹
+      </a>
+    ) : (
+      <span class="rounded-md border border-[var(--color-card-border)] px-3 py-1.5 text-sm opacity-40">‹</span>
+    )}
+
+    {visible.map((p) => p === "…" ? (
+      <span class="px-2 text-sm opacity-60">…</span>
+    ) : p === currentPage ? (
+      <span
+        class="rounded-md bg-[var(--color-success)] px-3 py-1.5 text-sm font-medium text-white"
+        aria-current="page"
+      >
+        {p}
+      </span>
+    ) : (
+      <a
+        href={linkFor(p)}
+        class="rounded-md border border-[var(--color-card-border)] px-3 py-1.5 text-sm hover:bg-white/5 hover:no-underline"
+      >
+        {p}
+      </a>
+    ))}
+
+    {currentPage < pageCount ? (
+      <a
+        href={linkFor(currentPage + 1)}
+        class="rounded-md border border-[var(--color-card-border)] px-3 py-1.5 text-sm hover:bg-white/5 hover:no-underline"
+        rel="next"
+      >
+        ›
+      </a>
+    ) : (
+      <span class="rounded-md border border-[var(--color-card-border)] px-3 py-1.5 text-sm opacity-40">›</span>
+    )}
+  </nav>
+)}

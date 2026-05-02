@@ -48,6 +48,5 @@ export default defineConfig({
   },
   redirects: {
     "/aboutMe": "/about",
-    "/devblog": "/devblog/",
   },
 });

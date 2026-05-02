@@ -1,0 +1,43 @@
+---
+import { formatDateRu, type BlogPostListItem } from "@/lib/blog";
+
+interface Props {
+  post: BlogPostListItem;
+  activeTag?: string | null;
+}
+
+const { post, activeTag } = Astro.props;
+---
+
+<article class="rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-5">
+  <header class="mb-3 flex items-baseline justify-between gap-3">
+    <time datetime={post.date.toISOString()} class="text-sm text-white/60">
+      {formatDateRu(post.date)}
+    </time>
+  </header>
+  <h2 class="m-0 text-xl font-semibold">
+    <a href={`/devblog/${post.slug}/`} class="hover:no-underline">
+      {post.title}
+    </a>
+  </h2>
+  {post.description && (
+    <p class="mt-2 line-clamp-3 text-white/85">{post.description}</p>
+  )}
+  {post.tags.length > 0 && (
+    <footer class="mt-4 flex flex-wrap gap-2">
+      {post.tags.map((tag) => (
+        <a
+          href={`/devblog/?tag=${encodeURIComponent(tag.name)}`}
+          class:list={[
+            "rounded-full border px-3 py-0.5 text-xs hover:no-underline",
+            tag.name === activeTag
+              ? "border-[var(--color-success)] bg-[var(--color-success)] text-white"
+              : "border-[var(--color-card-border)] text-white/85 hover:bg-white/5",
+          ]}
+        >
+          {tag.name}
+        </a>
+      ))}
+    </footer>
+  )}
+</article>

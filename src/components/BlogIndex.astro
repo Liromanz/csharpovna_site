@@ -1,0 +1,67 @@
+---
+import BlogCard from "@/components/BlogCard.astro";
+import Pagination from "@/components/Pagination.astro";
+import type { PaginatedPosts } from "@/lib/blog";
+
+interface Props {
+  paginated: PaginatedPosts;
+  allTags: { id: number; name: string }[];
+  activeTag: string | null;
+}
+
+const { paginated, allTags, activeTag } = Astro.props;
+const queryString = activeTag ? `tag=${encodeURIComponent(activeTag)}` : "";
+---
+
+<article class="mx-auto max-w-3xl px-4 py-8">
+  <header class="mb-6 flex items-baseline justify-between gap-3 border-b border-[var(--color-card-border)] pb-4">
+    <h1 class="m-0 text-3xl font-bold">Dev-блог</h1>
+    {activeTag && (
+      <a href="/devblog/" class="text-sm text-[var(--color-link)] hover:underline">
+        Сбросить фильтр
+      </a>
+    )}
+  </header>
+
+  <div class="mb-6 flex flex-wrap items-center gap-2 text-sm">
+    <span class="text-white/60">Фильтры:</span>
+    {allTags.map((t) => {
+      const isActive = activeTag === t.name;
+      return (
+        <a
+          href={isActive ? "/devblog/" : `/devblog/?tag=${encodeURIComponent(t.name)}`}
+          class:list={[
+            "rounded-full border px-3 py-1 hover:no-underline",
+            isActive
+              ? "border-[var(--color-success)] bg-[var(--color-success)] text-white"
+              : "border-[var(--color-card-border)] text-white/85 hover:bg-white/5",
+          ]}
+          aria-pressed={isActive}
+        >
+          {t.name}
+        </a>
+      );
+    })}
+  </div>
+
+  {paginated.items.length === 0 ? (
+    <p class="rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-6 text-center">
+      {activeTag
+        ? <>По тегу «<strong>{activeTag}</strong>» постов пока нет. <a href="/devblog/">Показать все</a></>
+        : "Постов пока нет."}
+    </p>
+  ) : (
+    <div class="space-y-4">
+      {paginated.items.map((post) => (
+        <BlogCard post={post} activeTag={activeTag} />
+      ))}
+    </div>
+  )}
+
+  <Pagination
+    currentPage={paginated.page}
+    pageCount={paginated.pageCount}
+    basePath="/devblog"
+    query={queryString}
+  />
+</article>
