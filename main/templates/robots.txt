@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /mypanel/
-Allow: /
-Sitemap: https://codedocss.ru/sitemap.xml
