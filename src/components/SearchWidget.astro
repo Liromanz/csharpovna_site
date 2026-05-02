@@ -1,0 +1,120 @@
+---
+// Pagefind search widget. Активируется по Cmd+K / Ctrl+K, открывает модал поверх контента.
+// Индекс генерируется командой pnpm build (см. package.json) в dist/client/pagefind/.
+// В dev-режиме индекса нет, поэтому виджет работает только после `pnpm build && pnpm preview`.
+---
+
+<button
+  type="button"
+  id="search-trigger"
+  class="hidden items-center gap-2 rounded-md border border-[var(--color-card-border)] px-3 py-1.5 text-sm text-white/70 transition-colors hover:bg-white/5 md:inline-flex"
+  aria-label="Открыть поиск (Ctrl+K)"
+>
+  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+  <span>Поиск</span>
+  <kbd class="ml-1 rounded border border-[var(--color-card-border)] px-1.5 py-0.5 text-xs">⌘K</kbd>
+</button>
+
+<dialog
+  id="search-dialog"
+  class="m-0 max-h-[80vh] w-full max-w-2xl rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-0 text-[var(--color-fg)] shadow-2xl backdrop:bg-black/60"
+>
+  <div class="border-b border-[var(--color-card-border)] p-3">
+    <div id="pagefind-search"></div>
+  </div>
+  <div class="p-3 text-xs text-white/60">
+    Поиск по всем урокам сайта. Закрыть — <kbd>Esc</kbd>.
+  </div>
+</dialog>
+
+<script>
+  const trigger = document.getElementById("search-trigger") as HTMLButtonElement | null;
+  const dialog = document.getElementById("search-dialog") as HTMLDialogElement | null;
+
+  let pagefindLoaded = false;
+  let pagefindLoading: Promise<void> | null = null;
+
+  function loadPagefindUI(): Promise<void> {
+    if (pagefindLoaded) return Promise.resolve();
+    if (pagefindLoading) return pagefindLoading;
+
+    pagefindLoading = new Promise<void>((resolve, reject) => {
+      // Стили виджета
+      const styleLink = document.createElement("link");
+      styleLink.rel = "stylesheet";
+      styleLink.href = "/pagefind/pagefind-ui.css";
+      document.head.appendChild(styleLink);
+
+      // JS виджета — обычный <script>, чтобы Rollup не пытался резолвить во время билда.
+      const script = document.createElement("script");
+      script.src = "/pagefind/pagefind-ui.js";
+      script.onload = () => {
+        const PagefindUI = (window as unknown as { PagefindUI?: new (opts: object) => unknown }).PagefindUI;
+        if (!PagefindUI) {
+          reject(new Error("PagefindUI not exported on window"));
+          return;
+        }
+        new PagefindUI({
+          element: "#pagefind-search",
+          showSubResults: true,
+          showImages: false,
+          translations: {
+            placeholder: "Поиск по сайту...",
+            clear_search: "Очистить",
+            load_more: "Загрузить ещё",
+            search_label: "Поиск",
+            filters_label: "Фильтры",
+            zero_results: "Ничего не найдено по запросу [SEARCH_TERM]",
+            many_results: "Найдено [COUNT] результатов для [SEARCH_TERM]",
+            one_result: "Найден [COUNT] результат для [SEARCH_TERM]",
+            alt_search: "По запросу [SEARCH_TERM] ничего не найдено. Показаны результаты для [DIFFERENT_TERM]",
+            search_suggestion: "Ничего не найдено по запросу [SEARCH_TERM]. Попробуйте: [DIFFERENT_TERM]",
+            searching: "Ищем «[SEARCH_TERM]»...",
+          },
+        });
+        pagefindLoaded = true;
+        resolve();
+      };
+      script.onerror = () => reject(new Error("Failed to load Pagefind UI script"));
+      document.body.appendChild(script);
+    });
+
+    pagefindLoading.catch((e) => {
+      console.warn("Pagefind UI not available — run `pnpm build` first.", e);
+      const el = document.getElementById("pagefind-search");
+      if (el) {
+        el.innerHTML = '<p class="p-3 text-sm text-white/70">Поиск доступен только в production-сборке.</p>';
+      }
+    });
+
+    return pagefindLoading;
+  }
+
+  async function openSearch() {
+    if (!dialog) return;
+    await loadPagefindUI();
+    dialog.showModal();
+    setTimeout(() => {
+      const input = dialog.querySelector<HTMLInputElement>("input[type=text]");
+      input?.focus();
+    }, 50);
+  }
+
+  trigger?.addEventListener("click", openSearch);
+
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      if (dialog?.open) dialog.close();
+      else openSearch();
+    }
+  });
+
+  dialog?.addEventListener("click", (e) => {
+    // Закрыть по клику вне модалки
+    if (e.target === dialog) dialog.close();
+  });
+</script>

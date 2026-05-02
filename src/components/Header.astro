@@ -1,5 +1,6 @@
 ---
 import { sectionList, type SectionId } from "@/data/sections";
+import SearchWidget from "@/components/SearchWidget.astro";
 
 interface Props {
   currentSection: SectionId;
@@ -47,7 +48,8 @@ const { currentSection } = Astro.props;
       })}
     </nav>
 
-    <nav class="ms-auto flex items-center gap-1" aria-label="Основное меню">
+    <nav class="ms-auto flex items-center gap-2" aria-label="Основное меню">
+      <SearchWidget />
       <a href="/" class="rounded px-2 py-1 text-sm text-white/85 hover:bg-white/10 hover:no-underline">Главная</a>
       <a href="/devblog/" class="rounded px-2 py-1 text-sm text-white/85 hover:bg-white/10 hover:no-underline">Dev-блог</a>
       <a href="/about" class="hidden rounded px-2 py-1 text-sm text-white/85 hover:bg-white/10 hover:no-underline md:inline">Обо мне</a>
