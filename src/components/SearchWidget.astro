@@ -95,7 +95,20 @@
 
   async function openSearch() {
     if (!dialog) return;
-    await loadPagefindUI();
+    if (import.meta.env.DEV) {
+      const el = document.getElementById("pagefind-search");
+      if (el && !el.dataset.devNotice) {
+        el.innerHTML =
+          '<p class="p-3 text-sm text-white/70">Поиск доступен только в production-сборке. Запусти <code>pnpm build &amp;&amp; pnpm preview</code>.</p>';
+        el.dataset.devNotice = "true";
+      }
+    } else {
+      try {
+        await loadPagefindUI();
+      } catch {
+        // placeholder уже выставлен в catch блока loadPagefindUI
+      }
+    }
     dialog.showModal();
     setTimeout(() => {
       const input = dialog.querySelector<HTMLInputElement>("input[type=text]");

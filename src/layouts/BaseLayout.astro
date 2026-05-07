@@ -3,6 +3,7 @@ import "@/styles/global.css";
 import Sidebar from "@/components/Sidebar.astro";
 import Header from "@/components/Header.astro";
 import SEO from "@/components/SEO.astro";
+import ScrollControls from "@/components/ScrollControls.astro";
 import { detectSection, type SectionId } from "@/data/sections";
 
 interface Props {
@@ -73,5 +74,6 @@ const currentSection: SectionId = section ?? detectSection(Astro.url.pathname);
         </footer>
       </div>
     </div>
+    <ScrollControls />
   </body>
 </html>

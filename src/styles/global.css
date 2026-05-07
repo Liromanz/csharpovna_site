@@ -1,30 +1,32 @@
 @import "tailwindcss";
 
-/* Design tokens — палитра один-в-один с текущим codedocss.ru */
+/* Design tokens — sage green palette
+   Source: https://coolors.co/dad7cd-a3b18a-588157-3a5a40-344e41 */
 @theme {
-  --color-bg: #2b2b2b;
-  --color-fg: #d0d0d0;
-  --color-link: #60c25d;
-  --color-link-hover: #93cc6d;
+  --color-bg: #232826;
+  --color-fg: #dad7cd;
+  --color-link: #b3d289;
+  --color-link-hover: #d6e5b3;
 
-  --color-sidebar: #202d1d;
-  --color-sidebar-header: #93cc6d;
-  --color-sidebar-hover: #819f6c;
-  --color-sidebar-active: #597c42;
-  --color-sidebar-submenu: #38442d;
-  --color-sidebar-border: #6c8b47;
+  --color-sidebar: #344E41;
+  --color-sidebar-header: #dad7cd;
+  --color-sidebar-hover: #588157;
+  --color-sidebar-active: #3a5a40;
+  --color-sidebar-submenu: #2d4337;
+  --color-sidebar-border: #588157;
   --color-sidebar-fg: #ffffff;
 
-  --color-card-bg: #1f1f1f;
-  --color-card-border: #3a3a3a;
+  --color-header: #1f2a25;
+  --color-card-bg: #1f2421;
+  --color-card-border: #3a5a40;
 
-  --color-code-bg: #222222;
-  --color-code-fg: #ffffff;
+  --color-code-bg: #1d231f;
+  --color-code-fg: #dad7cd;
 
   --color-overlay: rgba(0, 0, 0, 0.5);
 
-  --color-success: #198754;
-  --color-danger: #dc3545;
+  --color-success: #588157;
+  --color-danger: #c0584b;
 
   --font-sans:
     "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -137,13 +139,65 @@ h6:hover .heading-anchor {
 .prose-lesson li {
   font-size: 1rem;
 }
-.prose-lesson ul,
+.prose-lesson p {
+  margin: 1.1em 0;
+}
+.prose-lesson p:first-of-type {
+  margin-top: 0;
+}
+.prose-lesson ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin: 1em 0;
+}
 .prose-lesson ol {
+  list-style: decimal;
   padding-left: 1.5rem;
   margin: 1em 0;
 }
 .prose-lesson li {
   margin: 0.4em 0;
+}
+.prose-lesson li::marker {
+  color: var(--color-link);
+}
+
+/* Ссылки в теле урока — подчёркнутые и более акцентные, чтобы выделялись на фоне обычного текста */
+.prose-lesson a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-link) 50%, transparent);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.prose-lesson a:hover {
+  color: var(--color-link-hover);
+  text-decoration-color: var(--color-link-hover);
+}
+
+/* Callout-плашка — оформляется через blockquote `> ...` */
+.prose-lesson blockquote {
+  margin: 1.5em 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-card-border);
+  border-left: 3px solid var(--color-link);
+  background: var(--color-card-bg);
+  border-radius: 0.5rem;
+}
+.prose-lesson blockquote > :first-child {
+  margin-top: 0;
+}
+.prose-lesson blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* Разделитель секций — невидимый, только вертикальный отступ */
+.prose-lesson hr {
+  border: none;
+  background: none;
+  height: 0;
+  margin: 2em 0;
 }
 .prose-lesson img {
   max-width: 100%;

@@ -1,0 +1,43 @@
+---
+// Плавающие кнопки прокрутки в правом нижнем углу — наверх и в самый низ страницы
+---
+
+<div
+  class="fixed bottom-4 right-4 z-30 flex flex-col gap-2"
+  aria-label="Быстрая навигация по странице"
+>
+  <button
+    id="scroll-to-top"
+    type="button"
+    aria-label="Наверх страницы"
+    class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-card-border)] bg-[var(--color-card-bg)] text-[var(--color-link)] shadow-lg transition-colors hover:border-[var(--color-link)] hover:text-[var(--color-link-hover)]"
+  >
+    <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M8 13V3" />
+      <path d="M3 8l5-5 5 5" />
+    </svg>
+  </button>
+  <button
+    id="scroll-to-bottom"
+    type="button"
+    aria-label="Вниз страницы"
+    class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-card-border)] bg-[var(--color-card-bg)] text-[var(--color-link)] shadow-lg transition-colors hover:border-[var(--color-link)] hover:text-[var(--color-link-hover)]"
+  >
+    <svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M8 3v10" />
+      <path d="M3 8l5 5 5-5" />
+    </svg>
+  </button>
+</div>
+
+<script>
+  document.getElementById("scroll-to-top")?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  document.getElementById("scroll-to-bottom")?.addEventListener("click", () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  });
+</script>

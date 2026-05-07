@@ -13,14 +13,22 @@ const filtered = headings.filter((h) => h.depth >= minDepth && h.depth <= maxDep
 ---
 
 {filtered.length > 0 && (
-  <aside class="mb-6 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-4">
-    <h2 class="m-0 mb-2 text-base font-semibold text-[var(--color-link-hover)]">Содержание</h2>
-    <ul class="m-0 list-none space-y-1 p-0 text-sm">
-      {filtered.map((h) => (
-        <li class:list={[h.depth === 3 && "ml-4"]}>
-          <a href={`#${h.slug}`} class="text-[var(--color-link)] hover:underline">{h.text}</a>
-        </li>
-      ))}
+  <aside class="mb-8 not-prose">
+    <p class="m-0 mb-3 text-xs font-semibold uppercase tracking-wider text-white/50">Содержание</p>
+    <ul class="m-0 list-disc space-y-0.5 pl-5 text-sm marker:text-[var(--color-link)]">
+      {filtered.map((h) => {
+        const text = h.text.replace(/\s*#\s*$/, "");
+        return (
+          <li class:list={[h.depth === 3 && "ml-3"]}>
+            <a
+              href={`#${h.slug}`}
+              class="block py-1 text-white/70 transition-colors hover:text-white hover:no-underline"
+            >
+              {text}
+            </a>
+          </li>
+        );
+      })}
     </ul>
   </aside>
 )}

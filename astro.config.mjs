@@ -4,9 +4,11 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import node from "@astrojs/node";
 import expressiveCode from "astro-expressive-code";
+import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { rehypeTranslitSlug } from "./src/lib/rehype-translit-slug.mjs";
 
 const SITE_URL = process.env.SITE_URL ?? "https://codedocss.ru";
 
@@ -21,6 +23,7 @@ export default defineConfig({
   integrations: [
     expressiveCode({
       themes: ["github-dark"],
+      plugins: [pluginLineNumbers()],
       styleOverrides: {
         codeFontFamily: 'var(--font-mono, "Cascadia Code", "JetBrains Mono", ui-monospace, monospace)',
         codeBackground: "var(--color-code-bg, #222)",
@@ -28,6 +31,7 @@ export default defineConfig({
       },
       defaultProps: {
         wrap: true,
+        showLineNumbers: true,
       },
     }),
     mdx(),
@@ -35,6 +39,7 @@ export default defineConfig({
   ],
   markdown: {
     rehypePlugins: [
+      rehypeTranslitSlug,
       rehypeSlug,
       [
         rehypeAutolinkHeadings,

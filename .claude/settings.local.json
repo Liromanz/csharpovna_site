@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(& \"D:\\\\Programm Files\\\\Git\\\\cmd\\\\git.exe\" show \"2ed2d84^:csharp/templates/1_Variables.html\")",
+      "PowerShell(& \"D:\\\\Programm Files\\\\Git\\\\cmd\\\\git.exe\" show \"2ed2d84^:csharp/templates/4_var.html\")",
+      "PowerShell(& \"D:\\\\Programm Files\\\\Git\\\\cmd\\\\git.exe\" show \"2ed2d84^:csharp/templates/3_Datetime.html\")"
+    ]
+  }
+}
