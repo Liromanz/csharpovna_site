@@ -19,7 +19,7 @@
 
 <dialog
   id="search-dialog"
-  class="m-0 max-h-[80vh] w-full max-w-2xl rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-0 text-[var(--color-fg)] shadow-2xl backdrop:bg-black/60"
+  class="mx-auto mt-[10vh] max-h-[80vh] w-full max-w-2xl rounded-lg border border-[var(--color-card-border)] bg-[var(--color-card-bg)] p-0 text-[var(--color-fg)] shadow-2xl backdrop:bg-black/60"
 >
   <div class="border-b border-[var(--color-card-border)] p-3">
     <div id="pagefind-search"></div>
@@ -28,6 +28,87 @@
     Поиск по всем урокам сайта. Закрыть — <kbd>Esc</kbd>.
   </div>
 </dialog>
+
+<style is:global>
+  /* Pagefind UI в тёмной теме. Полный список переменных:
+     https://pagefind.app/docs/ui/#customising-the-styles */
+  #search-dialog .pagefind-ui {
+    --pagefind-ui-primary: var(--color-link);
+    --pagefind-ui-text: var(--color-fg);
+    --pagefind-ui-background: var(--color-card-bg);
+    --pagefind-ui-border: var(--color-card-border);
+    --pagefind-ui-tag: var(--color-sidebar-submenu);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 6px;
+    --pagefind-ui-font: inherit;
+  }
+
+  /* Поисковое поле — затемнить и сделать текст видимым */
+  #search-dialog .pagefind-ui__search-input {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+  }
+  #search-dialog .pagefind-ui__search-input::placeholder {
+    color: rgb(255 255 255 / 0.5);
+  }
+  #search-dialog .pagefind-ui__search-input:focus,
+  #search-dialog .pagefind-ui__search-input:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+    border-color: var(--color-link);
+  }
+
+  /* Кнопка «Очистить» (×) */
+  #search-dialog .pagefind-ui__search-clear {
+    color: var(--color-fg);
+    background-color: transparent;
+  }
+  #search-dialog .pagefind-ui__search-clear:hover {
+    background-color: rgb(255 255 255 / 0.08);
+  }
+
+  /* Заголовки и подзаголовки результатов — светлые на тёмном */
+  #search-dialog .pagefind-ui__result-title,
+  #search-dialog .pagefind-ui__result-title a,
+  #search-dialog .pagefind-ui__result-link {
+    color: var(--color-link);
+  }
+  #search-dialog .pagefind-ui__result-title a:hover,
+  #search-dialog .pagefind-ui__result-link:hover {
+    color: var(--color-link-hover);
+  }
+
+  /* Excerpt / тело результата */
+  #search-dialog .pagefind-ui__result-excerpt,
+  #search-dialog .pagefind-ui__result {
+    color: var(--color-fg);
+  }
+
+  /* Подсветка совпадений в результатах */
+  #search-dialog .pagefind-ui__result mark,
+  #search-dialog .pagefind-ui__result-excerpt mark {
+    background-color: rgb(255 224 102 / 0.35);
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+
+  /* Сообщения «найдено N результатов» / «ничего не найдено» */
+  #search-dialog .pagefind-ui__message,
+  #search-dialog .pagefind-ui__results-area,
+  #search-dialog .pagefind-ui__button {
+    color: var(--color-fg);
+  }
+
+  /* Кнопка «Загрузить ещё» */
+  #search-dialog .pagefind-ui__button {
+    background-color: var(--color-sidebar-submenu);
+    border-color: var(--color-card-border);
+  }
+  #search-dialog .pagefind-ui__button:hover {
+    background-color: var(--color-sidebar-hover);
+  }
+</style>
 
 <script>
   const trigger = document.getElementById("search-trigger") as HTMLButtonElement | null;
