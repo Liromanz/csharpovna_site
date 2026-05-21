@@ -25,7 +25,7 @@ dist/
 public/pagefind/
 
 # SQLite database files (per-environment, kept in persistent volume on prod)
-data/
+/data/
 *.sqlite3
 *.sqlite3-journal
 *.db
