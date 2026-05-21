@@ -1,0 +1,151 @@
+---
+title: 'События в WPF: Click, MessageBox и работа с TextBlock и TextBox'
+description: 'Привязка событий к элементам WPF через панель свойств, обработчик Button_Click, вывод сообщений через MessageBox.Show, изменение текста TextBlock через имя элемента и чтение значения из TextBox.Text.'
+group: 'Основы WPF и XAML'
+placeholder: false
+keywords:
+  - WPF
+  - события
+  - Click
+  - MessageBox
+  - 'MessageBox.Show'
+  - TextBlock
+  - TextBox
+  - 'InitializeComponent'
+  - 'xaml.cs'
+---
+
+## События
+
+Хорошо, мы научились менять сам вид кнопок, но как мне привязать к элементу какое-то действие, например, для кнопки — нажатие, а для текстбокса — изменение текста?
+
+Для этого у нас существуют события. Список всех событий мы можем посмотреть также через свойства, однако нужно немного изменить окошко. Справа сверху, вместо гаечного ключа, где у нас есть настройка самого объекта, есть молния, внутри которой как раз хранятся все события.
+
+![Иконка молнии в панели «Свойства» — переключение на список событий](../../assets/wpf/events-msgbox/1_events_lightning.png)
+
+Нажмем на эту молнию и увидим полный список событий для выбранного объекта, в моем случае, для кнопки. Сделать здесь можно все, что угодно — обработать клик, нажатие ПКМ, наведение мышки, фокус на объекте, загрузку объекта (момент, когда кнопка была создана) и прочее.
+
+![Полный список событий кнопки: Click, ContextMenuClosing, ContextMenuOpening и другие](../../assets/wpf/events-msgbox/2_events_list.png)
+
+Давайте обработаем нажатие. Для этого дважды нажмем по пустому блоку напротив слова Click. Внутри самого блока появится название метода, обрабатывающее событие, а внутри файла xaml.cs этого окна будет находится метод с логикой, которая должна происходить при нажатии на кнопку.
+
+![Поле Click заполнено именем обработчика Button_Click](../../assets/wpf/events-msgbox/3_click_assigned.png)
+
+![Сгенерированный метод Button_Click в файле MainWindow.xaml.cs](../../assets/wpf/events-msgbox/4_xaml_cs_structure.png)
+
+## Структура xaml.cs
+
+Перед тем, как начать делать логику для кнопки, давайте посмотрим из чего в принципе состоит наш xaml.cs.
+
+- Сам класс нашего окна наследует класс `Window`, позволяя нам работать с этим классом, как с окном.
+- Внутри класса есть конструктор с методом `InitializeComponent()`. Этот метод создает само окно, т.е. работа окна начинается не с самого окна, а с xaml.cs, уже из которого идет создание окна. **!ВАЖНО!**, если вы будете работать с объектами интерфейса до метода `InitializeComponent()`, тогда у вас код выкинет ошибку, по той причине, что интерфейс еще не был создан.
+- Вся остальная область класса отведена для событий и каких-то собственных методов.
+
+## MessageBox
+
+Теперь, рассмотрим сам метод, отвечающий за событие нажатия на кнопку. В качестве параметров этого метода, у нас есть переменная `sender`, где хранится объект, который вызвал событие (в нашем случае кнопка), и `e` — само произошедшее событие. Из sender-а мы можем как-либо взаимодействовать с объектом, например, поменять его текст, а из «e» — взаимодействовать с событием, например, отменить его.
+
+![Параметры обработчика Button_Click: sender — объект, вызвавший событие, e — само событие](../../assets/wpf/events-msgbox/5_method_signature.png)
+
+Внутри метода уже будет сама логика приложения. Давайте, например, выведем окошко с сообщением «Hello, world!». В консоли мы выводили текст с помощью `Console.WriteLine()`, а здесь, раз мы хотим сделать окошко, мы сделаем `MessageBox.Show()`, т.е. я хочу использовать диалоговое окно, а именно, показать какой-то текст. Показываемый текст будет внутри метода `Show()`.
+
+```csharp
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+    MessageBox.Show("Hello, world!");
+}
+```
+
+И теперь, при запуске приложения и нажатия на кнопку, мы увидим сообщение в диалоговом окошке.
+
+![Запущенное приложение с диалоговым окном «Hello, world!»](../../assets/wpf/events-msgbox/6_messagebox_result.png)
+
+Но достаточно неприятно, если все данные, которые у нас есть, будут показываться через диалоговое окно. Зачем нам тогда интерфейс? Давайте научимся выводить текст на самом интерфейсе.
+
+## Чтение и вывод текста
+
+Условно говоря, все наши объекты интерфейса, это тоже какие-то переменные, только для того, чтобы с ними взаимодействовать, нам нужно дать им имя. Имя этим объектам дается в свойствах. Например, я дам имя текстблоку, чтобы я смогла обратиться к тексту и вывести туда какой-то текст. Имя, как и название переменной, может быть любым, главное, чтобы названия не повторялись.
+
+![Поле «Имя» в свойствах TextBlock со значением MyBlock](../../assets/wpf/events-msgbox/7_textblock_name.png)
+
+Теперь, мы можем взаимодействовать с этим элементом, с помощью его имени. Но как мне изменить именно текст? Заметим, что свойство текста у текстблока называется как «Text». Так что если я хочу взаимодействовать с текстом из кода, мне необходимо прямо так и написать — я хочу использовать свой объект, а именно, текст.
+
+![Свойство Text у TextBlock в панели «Свойства»](../../assets/wpf/events-msgbox/8_textblock_text_property.png)
+
+```csharp
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+    MyBlock.Text = "поменяла текст!";
+}
+```
+
+И теперь, после того, как мы нажмем на кнопку, текст изменится.
+
+![До нажатия — TextBlock; после нажатия — «поменяла текст!»](../../assets/wpf/events-msgbox/9_text_change_result.png)
+
+## Ввод текста через TextBox
+
+Точно также я могу взаимодействовать и с введенным текстом. Мне нужно дать имя текстбоксу, в который я ввожу текст, а потом, по нажатию на кнопку, я хочу вывести введеный текст. Алгоритм тот же:
+
+- Даем имя элементу — текстбоксу, я назову его `MyInputBox`.
+- Проверяем, какое свойство отвечает за текст — `Text`.
+- Через `MyInputBox.Text` берем введенное значение и пихаем его в `MyBlock.Text`.
+
+![Поле «Имя» у TextBox со значением MyInputBox и свойство Text](../../assets/wpf/events-msgbox/10_textbox_name.png)
+
+```csharp
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+    MyBlock.Text = MyInputBox.Text;
+}
+```
+
+![До нажатия — TextBox с введённым текстом; после нажатия — этот же текст в TextBlock](../../assets/wpf/events-msgbox/11_input_to_output.png)
+
+## Полный код примера
+
+`MainWindow.xaml` с тремя элементами и привязанным обработчиком клика:
+
+```xml
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <TextBox x:Name="MyInputBox"
+                 HorizontalAlignment="Left" VerticalAlignment="Top"
+                 Margin="100,100,0,0" Width="120"/>
+        <TextBlock x:Name="MyBlock" Text="TextBlock"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Button Content="текстик"
+                Background="#FFCA4F4F" Foreground="White"
+                Click="Button_Click"/>
+    </Grid>
+</Window>
+```
+
+`MainWindow.xaml.cs` с обработчиком кнопки:
+
+```csharp
+using System.Windows;
+
+namespace WpfApp2
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            MyBlock.Text = MyInputBox.Text;
+        }
+    }
+}
+```

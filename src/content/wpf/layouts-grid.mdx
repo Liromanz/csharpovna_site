@@ -1,0 +1,270 @@
+---
+title: 'Адаптивная вёрстка в WPF: Grid, RowDefinitions, ColumnDefinitions, StackPanel и WrapPanel'
+description: 'Адаптивная вёрстка в WPF: разметка Grid через RowDefinitions и ColumnDefinitions, ширины Auto, фиксированные и пропорциональные через *, размещение элементов через Grid.Row, Grid.Column, ColumnSpan, выравнивание VerticalAlignment/HorizontalAlignment, контейнеры StackPanel и WrapPanel.'
+group: 'Основы WPF и XAML'
+placeholder: false
+keywords:
+  - WPF
+  - адаптивная вёрстка
+  - Grid
+  - RowDefinitions
+  - ColumnDefinitions
+  - 'Grid.Row'
+  - 'Grid.Column'
+  - ColumnSpan
+  - StackPanel
+  - WrapPanel
+---
+
+Все это время, когда мы перетаскивали объекты на экран, они были статичные. Если бы мы поменяли размер окна, объекты бы остались на своем месте.
+
+![Окно с тремя элементами в исходном размере](../../assets/wpf/layouts-grid/01_static_default.png)
+
+![То же окно, но растянутое — элементы остались на своих фиксированных позициях](../../assets/wpf/layouts-grid/02_static_resized.png)
+
+Для того, чтобы объекты визуально оставались на своем месте и передвигались вместе с изменением окна, существует такое понятие, как адаптивная вёрстка. Вёрстка — наш интерфейс, адаптивная — интерфейс будет адаптироваться под изменяемый размер окна. Давайте научимся писать адаптивную вёрстку.
+
+Адаптивную вёрстку мы делаем с помощью сеток. Пока что единственная сетка, которую мы знаем, это `Grid`. Его можно разделять на столбцы и строки. Единственная проблема адаптивной вёрстки в том, что её удобнее всего писать в XAML, то есть через панель элементов комфортно уже не получится поработать, в любом случае придется менять XAML.
+
+Например, давайте сделаем вот такой интерфейс для анкеты, но чтобы она не съезжала при изменении окна.
+
+![Анкета для подружек: ФИО, Возраст, Хобби, Любимая певица + кнопка «Добавить анкету» — компактное окно](../../assets/wpf/layouts-grid/03_target_form_small.png)
+
+![Та же анкета в широком окне — все элементы по-прежнему правильно расположены](../../assets/wpf/layouts-grid/04_target_form_wide.png)
+
+## Разметка Grid
+
+Сначала, условно разметим на сколько столбцов и строк нам нужно будет разделить наш интерфейс.
+
+![Анкета с нарисованной поверх сеткой: 6 строк и 2 столбца](../../assets/wpf/layouts-grid/05_grid_layout_plan.png)
+
+Заметим, что кнопка и верхний текст немного не вписываются в наши столбцы. Но это ничего страшного, элементы можно размещать и на нескольких столбцах или строках одновременно. Главное — наметить основную сетку.
+
+Теперь, давайте начнем разделять её. Все старые элементы я удалю, начнем писать вёрстку с чистого листа. У меня осталась только пустая сетка (и окно наверху, соответственно).
+
+```xml
+<Grid>
+
+</Grid>
+```
+
+Чтобы разделить наш Grid на несколько столбцов и строк, у нас есть такие теги, как `Grid.RowDefinitions` — определение строк и `Grid.ColumnDefinitions` — определение «колонн» — столбцов соответственно. Чтобы создать столбцы и строки, мне сначала нужно создать контейнер для этих столбцов и строк.
+
+![XAML с двумя контейнерами Grid.RowDefinitions «для строк» и Grid.ColumnDefinitions «для столбцов»](../../assets/wpf/layouts-grid/06_rowdef_coldef_annotated.png)
+
+Внутри этих тегов мы и будем располагать наши столбцы — `ColumnDefinition`, и строки — `RowDefinition`. Мы хотели сделать шесть строк и два столбца. Если мы все сделали правильно, на экране у нас уже начнут появляться разделения.
+
+![В превью видны 6 пустых строк и 2 столбца, в XAML — 6 RowDefinition и 2 ColumnDefinition](../../assets/wpf/layouts-grid/07_grid_rows_cols_numbered.png)
+
+## Размеры строк и столбцов
+
+Также, столбцы и строки можно настроить по ширине. Всего есть три основных настройки ширины/длины:
+
+- **Фиксированная ширина** (например, 50 пикселей).
+
+```xml
+<RowDefinition Height="50"/>
+```
+
+![Превью: первая строка фиксированной высоты 50 пикселей](../../assets/wpf/layouts-grid/08_row_fixed_50.png)
+
+- **Автоматическая ширина по содержимому** (`Auto`).
+
+```xml
+<RowDefinition Height="Auto"/>
+```
+
+![Превью с пустой Auto-строкой и подписью «если внутри строки ничего нет, она будет скрыта»](../../assets/wpf/layouts-grid/09_row_auto_empty.png)
+
+![Превью с кнопкой в Auto-строке и подписью «размер подстроится под содержимое»](../../assets/wpf/layouts-grid/10_row_auto_text.png)
+
+- **Автоматическое заполнение по долям** (если ширина не указана, то ширина колонки ставится по долям. Отмечается как `*`). В самом начале все колонки имеют соотношение 1 к 1.
+
+```xml
+<Grid.ColumnDefinitions>
+    <ColumnDefinition/>
+    <ColumnDefinition/>
+</Grid.ColumnDefinitions>
+```
+
+```xml
+<Grid.ColumnDefinitions>
+    <ColumnDefinition Width="*"/>
+    <ColumnDefinition Width="*"/>
+</Grid.ColumnDefinitions>
+```
+
+![Превью с двумя одинаковыми по ширине колонками 1* / 1*](../../assets/wpf/layouts-grid/11_columns_star_equal.png)
+
+Если мы хотим изменить соотношение, тогда мы должны поставить число перед звездочкой. Если мы хотим, чтобы правая колонка была больше в 2 раза, тогда перед звездочкой поставим цифру 2. Первая также станет меньше из-за соотношения сторон.
+
+```xml
+<Grid.ColumnDefinitions>
+    <ColumnDefinition Width="*"/>
+    <ColumnDefinition Width="2*"/>
+</Grid.ColumnDefinitions>
+```
+
+![Превью с колонками соотношения 1* и 2*](../../assets/wpf/layouts-grid/12_columns_1_2.png)
+
+```xml
+<Grid.ColumnDefinitions>
+    <ColumnDefinition Width="0.5*"/>
+    <ColumnDefinition Width="2*"/>
+</Grid.ColumnDefinitions>
+```
+
+![Превью с колонками 0.5* и 2* — обе подчёркнуты](../../assets/wpf/layouts-grid/13_columns_05_2.png)
+
+Хорошо, разобрались с тремя размерами столбцов и строк. Теперь, вспоминая нашу разлиновку, вспомним, что второй столбец должен быть в два раза больше, чем первый. Дадим второму столбцу ширину в `2*`, и получим то, что нам нужно.
+
+![Финальная разлиновка анкеты: 6 строк и 2 столбца с пропорцией 1* / 2*](../../assets/wpf/layouts-grid/14_grid_final_layout.png)
+
+## Размещение элементов
+
+Теперь, давайте расположим элементы интерфейса внутри сетки. Мы хотели, чтобы на самом верху у нас располагался текст — «Анкета для подружек». Я создам `TextBlock` с этим текстом прямо в XAML. Когда мы создаем объект внутри сетки, он создается в самой левой верхней ячейке — строка 0 и столбец 0.
+
+![TextBlock «Анкета для подружек» в верхней левой ячейке (строка 0, столбец 0)](../../assets/wpf/layouts-grid/15_textblock_topleft.png)
+
+Если я захочу переместить этот текст в другую ячейку, мне необходимо указать строку и столбец с помощью свойств `Grid.Row` и `Grid.Column` соответственно. Вспомним, что в программировании все начинается с нуля, так что если я хочу переместить объект во 2 столбец и 3 ряд, мне необходимо поставить `Grid.Column="1"` и `Grid.Row="2"`.
+
+![TextBlock перемещён в ячейку Grid.Column="1" Grid.Row="2", подпись нумерации строк/столбцов](../../assets/wpf/layouts-grid/16_grid_row_col_numbered.png)
+
+Тоже самое мы можем сделать с любыми объектами. Если столбец или строка не будет указаны, они по умолчанию будут иметь значение 0.
+
+## ColumnSpan и выравнивание
+
+Вернем наш текст обратно на позицию 0 0, мы же хотели, чтобы текст был наверху. Однако если он просто останется наверху, он будет выглядеть не так, как мы хотели. Нам нужно расположить ее на двух колонках одновременно. Для этого, у нас есть `ColumnSpan` или `RowSpan` — охват столбцов или охват строк соответственно. Например, я хочу, чтобы мой текст охватил 2 колонки. Тогда мне необходимо написать `Grid.ColumnSpan="2"`.
+
+![TextBlock с Grid.ColumnSpan="2", подпись «теперь текст на двух колонках»](../../assets/wpf/layouts-grid/17_columnspan_2.png)
+
+А для того, чтобы выровнять текст посередине, есть `VerticalAlignment` и `HorizontalAlignment` — вертикальное и горизонтальное выравнивание. Выровняем текст по центру.
+
+![TextBlock с HorizontalAlignment="Center" и VerticalAlignment="Center" — текст «Анкета для подружек» по центру](../../assets/wpf/layouts-grid/18_centered.png)
+
+Тоже самое реализуем для всех остальных объектов — текста, кнопки, и текстовых полей.
+
+![Полный XAML анкеты с RowDefinitions, ColumnDefinitions и заполненными ячейками](../../assets/wpf/layouts-grid/19_full_layout_xaml.png)
+
+И после долгой работы, мы увидим, что вся наша вёрстка адаптивная, при изменении окна, все объекты перемещаются и не ломаются.
+
+![Анкета в компактном окне](../../assets/wpf/layouts-grid/20_anketa_compact.png)
+
+![Та же анкета в широком окне — все элементы корректно растянулись и не наслоились](../../assets/wpf/layouts-grid/21_anketa_wide.png)
+
+## Дополнительно: виды сеток
+
+Также, есть некоторые виды сеток, которые работают отлично от `Grid`, но так сильно и подробно мы их разбирать не будем. Возьмем два вида.
+
+### StackPanel
+
+`StackPanel` отличается от `Grid` тем, что он сам размещает объекты под друг другом — они не наслаиваются друг на друга, а идут последовательно, друг под дружкой. Это можно сравнить с тем, если бы в `Grid` был один столбец и много-много строк.
+
+Все сетки пишутся либо вместо `Grid`, либо внутри него. Например, обычный `StackPanel` будет размещать элементы по вертикали, и даже если они выходят за пределы окна, он продолжит их ставить друг под дружку.
+
+![Окно со StackPanel и 8 кнопками, расположенными вертикально друг под другом](../../assets/wpf/layouts-grid/22_stackpanel_vertical.png)
+
+Чтобы изменить размещение элементов и сделать их не по вертикали, а по горизонтали, необходимо изменить ориентацию сетки. Для этого существует свойство `Orientation`. Если я хочу, чтобы элементы располагались справа налево, мне нужно поменять ориентацию на горизонтальную. По умолчанию стоит вертикальная ориентация.
+
+![StackPanel с Orientation="Horizontal": 8 кнопок выстроены в ряд](../../assets/wpf/layouts-grid/23_stackpanel_horizontal.png)
+
+### WrapPanel
+
+`WrapPanel` похож на `StackPanel`, даже имеет ориентацию, но его единственная разница в том, что если он встречает конец окна, он перемещает объект на следующую строчку или столбец. По умолчанию, стоит горизонтальная ориентация. С ней, объекты будут выглядеть вот так.
+
+![WrapPanel: 5 кнопок в первом ряду, 3 кнопки перенесены на второй ряд](../../assets/wpf/layouts-grid/24_wrappanel_horizontal.png)
+
+Если выставить вертикальную ориентацию, объекты будут выглядеть вот так.
+
+![WrapPanel с Orientation="Vertical": кнопки идут сверху вниз, а после исчерпания высоты переносятся в новую колонку](../../assets/wpf/layouts-grid/25_wrappanel_vertical.png)
+
+## Полный код примера
+
+`MainWindow.xaml` с адаптивной вёрсткой анкеты:
+
+```xml
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="242" Width="367">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Анкета для подружек" Grid.ColumnSpan="2"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <TextBlock Text="ФИО" Grid.Row="1"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Margin="5"
+                 VerticalContentAlignment="Center"/>
+
+        <TextBlock Text="Возраст" Grid.Row="2"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Margin="5"
+                 VerticalContentAlignment="Center"/>
+
+        <TextBlock Text="Хобби" Grid.Row="3"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="3" Grid.Column="1" Margin="5"
+                 VerticalContentAlignment="Center"/>
+
+        <TextBlock Text="Любимая певица" Grid.Row="4"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="4" Grid.Column="1" Margin="5"
+                 VerticalContentAlignment="Center"/>
+
+        <Button Content="Добавить анкету" Grid.Row="5" Grid.ColumnSpan="2" Margin="5"/>
+    </Grid>
+</Window>
+```
+
+`MainWindow.xaml` со `StackPanel` (вариант из «Дополнительно»):
+
+```xml
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="166" Width="257">
+    <StackPanel>
+        <Button Content="Первая"/>
+        <Button Content="Вторая"/>
+        <Button Content="Третья"/>
+        <Button Content="Четвертая"/>
+        <Button Content="Пятая"/>
+        <Button Content="Шестая"/>
+        <Button Content="Седьмая"/>
+        <Button Content="Восьмая"/>
+    </StackPanel>
+</Window>
+```
+
+`MainWindow.xaml` с `WrapPanel` (другой вариант из «Дополнительно»):
+
+```xml
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="166" Width="257">
+    <WrapPanel>
+        <Button Content="Первая"/>
+        <Button Content="Вторая"/>
+        <Button Content="Третья"/>
+        <Button Content="Четвертая"/>
+        <Button Content="Пятая"/>
+        <Button Content="Шестая"/>
+        <Button Content="Седьмая"/>
+        <Button Content="Восьмая"/>
+    </WrapPanel>
+</Window>
+```

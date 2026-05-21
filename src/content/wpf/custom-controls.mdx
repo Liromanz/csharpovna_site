@@ -1,0 +1,372 @@
+---
+title: 'ContextMenu и пользовательские UserControl в WPF: MenuItem, привязка карточек через xmlns и DataContext'
+description: 'Контекстное меню по ПКМ через TextBox.ContextMenu с MenuItem и Separator, обработчик Click для пунктов меню. Создание UserControl-карточки с картинкой и текстом, отображение в ListBox через код и XAML, добавление ссылки xmlns на папку, привязка свойств карточки через DataContext = this и {Binding}.'
+group: 'Графика и кастомизация UI'
+placeholder: false
+keywords:
+  - WPF
+  - ContextMenu
+  - MenuItem
+  - Separator
+  - UserControl
+  - ListBox
+  - DataContext
+  - Binding
+  - xmlns
+  - 'clr-namespace'
+---
+
+## Контекстное меню
+
+Мы часто видим, и даже иногда используем дополнительное меню, которое открывается по нажатию ПКМ. Такое меню (которое называется контекстным) мы можем создавать самостоятельно.
+
+Контекстное меню привязывается к какому-либо объекту, т.е. у разных элементов управления могут быть разные контекстные меню. Создам, например, текстовое поле и сделаю для него контекстное меню.
+
+![Visual Studio с MainWindow, в нём TextBox x:Name=Txt в центре окна, в редакторе виден соответствующий XAML](../../assets/wpf/custom-controls/01_textbox_xaml.png)
+
+Чтобы создать текстовое меню, мне нужно из моего объекта сделать парный тэг, потому что я собираюсь внутри писать это меню. Чтобы начать его реализовывать, я напишу `названиеобъекта.ContextMenu`.
+
+```xml
+<TextBox x:Name="Txt" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10">
+    <TextBox.ContextMenu>
+
+    </TextBox.ContextMenu>
+</TextBox>
+```
+
+Уже внутри начну реализовывать отдельный тэг — `ContextMenu`. Состоит он из `MenuItem`, который, по сути, является точно такой же кнопкой с кликом или командой. Также внутри можно ставить сепараторы — линеечки для разграничения кнопок.
+
+```xml
+<TextBox.ContextMenu>
+    <ContextMenu>
+        <MenuItem Header="Элемент 1"/>
+        <MenuItem Header="Элемент 2"/>
+        <MenuItem Header="Элемент 3"/>
+        <Separator/>
+        <MenuItem Header="Элемент 4"/>
+        <MenuItem Header="Элемент 5"/>
+    </ContextMenu>
+</TextBox.ContextMenu>
+```
+
+При таком контекстном меню, ПКМ по объекту будет выглядеть так.
+
+![Окно MainWindow с открытым по ПКМ контекстным меню: Элемент 1, 2, 3, разделительная линия, Элемент 4, 5](../../assets/wpf/custom-controls/02_contextmenu_run.png)
+
+Кроме обычных элементов сюда можно вставить и другие элементы интерфейса, которые мы знаем.
+
+```xml
+<ContextMenu>
+    <RadioButton Content="Это контекстное меню"/>
+    <TextBox Text="Тут можно тыкать"/>
+    <MenuItem Header="Элемент 3"/>
+    <Separator/>
+    <MenuItem Header="Элемент 4"/>
+    <MenuItem Header="Элемент 5"/>
+</ContextMenu>
+```
+
+![Окно с открытым контекстным меню: RadioButton, TextBox «Тут можно тыкать», Элемент 3, разделитель, Элемент 4, 5](../../assets/wpf/custom-controls/03_mixed_contextmenu_run.png)
+
+Каждому из этих объектов можно дать имя и взаимодействовать с ним. Это все ещё кнопки, которые могут иметь какое-то действие. Например, выведу в `MessageBox` значение из текстового поля, если я выбрала такой пункт внутри контекстного меню.
+
+![XAML TextBox с x:Name=Txt (оранжевое подчёркивание) и MenuItem с Header=«Вывести в MessageBox» Click=«MenuItem_Click» (оранжевое подчёркивание)](../../assets/wpf/custom-controls/04_menuitem_click_annotated.png)
+
+```csharp
+private void MenuItem_Click(object sender, RoutedEventArgs e)
+{
+    MessageBox.Show(Txt.Text);
+}
+```
+
+Результат будет следующим.
+
+![Окно с TextBox «в магнитоле продиджи», контекстное меню с пунктом «Вывести в MessageBox»](../../assets/wpf/custom-controls/05_input_with_contextmenu.png)
+
+![MessageBox с текстом «в магнитоле продиджи» и кнопкой ОК](../../assets/wpf/custom-controls/06_messagebox_input.png)
+
+Если я хочу сделать выпадающий список из элементов меню, всё что мне нужно, это расположить `MenuItem` внутрь одного из `MenuItem`.
+
+```xml
+<ContextMenu>
+    <MenuItem Header="Вывести в MessageBox" Click="MenuItem_Click">
+        <MenuItem Header="Элемент 1"/>
+        <MenuItem Header="Элемент 2"/>
+        <Separator/>
+        <MenuItem Header="Элемент 3"/>
+    </MenuItem>
+</ContextMenu>
+```
+
+![Контекстное меню с пунктом «Вывести в MessageBox» и раскрытым подменю: Элемент 1, 2, 3](../../assets/wpf/custom-controls/07_nested_menu.png)
+
+## Пользовательские элементы управления
+
+Если мы хотим разнообразить интерфейс более интересными и проработанными элементами, мы можем создать свои элементы управления, а затем добавлять их в интерфейс.
+
+Как вообще понять, что в интерфейсе есть карточка? Очень просто — если мы видим какой-то элемент, который часто повторяется, и состоит из нескольких объектов (картинка, текст, описание, ссылка, бла-бла-бла) — это карточка.
+
+![Панель стилей Word с миниатюрами Аа, рукописная оранжевая подпись «один стиль — карточка, несколько таких карточек расположены в wrappanel — разные стили»](../../assets/wpf/custom-controls/08_word_styles_annotated.png)
+
+![Список игр в Steam: Baldur's Gate 3, DOTA 2, PUBG, Rust, Team Fortress 2, Deep Rock Galactic — оранжевая подпись «вот это всё — тоже карточки, одна карточка — одна игра, которая расположена в одном листбоксе или стакпанеле»](../../assets/wpf/custom-controls/09_steam_cards_annotated.png)
+
+И вместо того, чтобы постоянно делать грид с картинкой, текстом и прочим, можно просто создать один элемент и не морочиться с `Ctrl + C`, `Ctrl + V`.
+
+Например, следующий список был сделан с помощью пользовательского элемента управления. Попробуем сделать что-то подобное.
+
+![Окно MainWindow со списком трёх карточек: человечек + ФИО (Скорогудаева София Алексеевна, Головин Иван Андреевич, Дарова Евгения Анатольевна)](../../assets/wpf/custom-controls/10_userlist_demo.png)
+
+### Создание UserControl
+
+Для начала создадим элемент управления через ПКМ по проекту → Добавить → Пользовательский элемент управления (WPF).
+
+![Контекстное меню в обозревателе решений Visual Studio: рукописные оранжевые цифры 1 (ПКМ по проекту), 2 (Добавить), 3 (Пользовательский элемент управления WPF)](../../assets/wpf/custom-controls/11_add_usercontrol_dialog.png)
+
+В появившемся окне назовем наш объект и добавим его в проект.
+
+![Диалог «Добавить новый элемент» с полем «Имя: UserView.xaml», оранжевые цифры 1 и 2 у поля имени и кнопки «Добавить»](../../assets/wpf/custom-controls/12_name_usercontrol.png)
+
+Как и в случае со страницами, пользовательские элементы управления не имеют фона (чтобы они смогли подстроится под фон основного окна) и первый тэг называется `UserControl`. Всё остальное полностью идентично — вся логика для этого элемента также находится в `xaml.cs`, все элементы интерфейса, сетки и картинки остались прежними.
+
+Рассмотрим ещё раз наш пример элемента управления.
+
+![Карточка с человечком и текстом «Дарова Евгения Анатольевна»](../../assets/wpf/custom-controls/13_single_card.png)
+
+Всё, что мы здесь видим — картинка с человеком и текст, в который вписано ФИО. Скачаем картинку из интернета с таким человечком, и начнем создавать интерфейс элемента.
+
+- `Grid.ColumnDefinition` — разделим сетку на 2 столбца: для картинки и для текста.
+- `Width="4*"` — второй столбец в 4 раза больше чем первый.
+- `Image` — расположим картинку в первой колонке. Дадим ей имя `UserImage`.
+- `TextBlock` — расположим текст во второй колонке. Дадим ей текст-заглушку «Фамилия Имя Отчество» и дадим имя `UserName`.
+- Уменьшим высоту самого окна под желаемую.
+
+![Конструктор UserView с человечком и текстом «Фамилия Имя Отчество», XAML с Grid.ColumnDefinitions и оранжевые рукописные подписи «Высота окна», «Колонки», «Колонка в 4 раза больше», «Картинка», «Поле с именем»](../../assets/wpf/custom-controls/14_card_designer_annotated.png)
+
+### Отображение карточек через код
+
+Модель нашего элемента мы создали, осталось отобразить их в виде списка. Вернемся в главное окно (`MainWindow`) и создадим `ListBox` для отображения списка. Дадим ему название `UserList`.
+
+![Пустой MainWindow и XAML с ListBox x:Name=UserList — рукописная подпись «Интерфейс выглядит пустым, т.к. он ещё не заполнен, но список создан»](../../assets/wpf/custom-controls/15_mainwindow_listbox_annotated.png)
+
+Так как мы хотим задать значения для списка прямо после создания интерфейса, то и список мы будем создавать после метода `InitializeComponent()`.
+
+Чтобы создать наш пользовательский элемент прямо из кода, мы возьмем его название — `UserView` — и будем относится к нему как к сложному типу данных. Сложные типы данных создаются по принципу `типданных название = new типданных`, так что и свой элемент я создам как `UserView first = new UserView();`.
+
+Создадим три таких элемента и запишем их в коллекцию. Эту коллекцию укажем как источник элементов для `ListBox` через `название.свойство` (`UserList.ItemsSource`).
+
+![Код конструктора MainWindow с тремя UserView (first, second, third), оранжевые рукописные подписи «3 пользовательских элемента», «Лист с элементами», «Источник элементов — верхний лист»](../../assets/wpf/custom-controls/16_userview_init_annotated.png)
+
+И после запуска мы сразу увидим подобный интерфейс, как на примере.
+
+![Запущенный MainWindow с тремя карточками: человечек + ФИО для каждого из трёх пользователей](../../assets/wpf/custom-controls/17_userlist_filled.png)
+
+Вся остальная работа со списком остаётся прежней:
+
+- Все элементы находятся в `ListBox`. Если мы хотим обработать изменение выбора, используем событие `SelectionChanged`. Выбранный элемент — `SelectedItem`. С помощью них я смогу взять данные из выбранного элемента управления.
+- Если мне нужно обработать кнопки внутри элемента управления, я буду работать с ним в файле элемента управления (в данном случае — в `UserView`).
+
+Так, например, если я хочу взять информацию из выбранного в листбоксе объекта, я возьму его при помощи `SelectedItem as <вставьте название вашей карточки>`, а потом из элементов внутри карточки я буду брать значения.
+
+Например, вот так я возьму имя у выбранной карточки и выведу её в `MessageBox`.
+
+```csharp
+private void UserList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    var name = (UserList.SelectedItem as UserView).UserName.Text;
+    MessageBox.Show(name);
+}
+```
+
+![Окно с тремя карточками и MessageBox с текстом «Головин Иван Андреевич»](../../assets/wpf/custom-controls/18_userlist_selected_msgbox.png)
+
+### Использование карточек внутри окна через XAML
+
+Но всё это — создание и работа с карточками через код. Да, выделить по-другому, кроме как через код, элемент нельзя, но зато можно создавать его через интерфейс. Давайте попробуем.
+
+Удалю созданные карточки из кода и перейду в XAML. Чтобы создать карточки внутри списка, мне необходимо его открыть и вместо обычных тэгов (типа `Button`) ввести туда тэг с названием моей карточки — `UserView`.
+
+Если карточка находится в корне проекта, Visual Studio сама предложит как правильно написать этот тэг.
+
+![Обозреватель решений с UserView.xaml в корне проекта рядом с MainWindow.xaml](../../assets/wpf/custom-controls/19_solution_explorer_root.png)
+
+![IntelliSense внутри ListBox предлагает UserView (local)](../../assets/wpf/custom-controls/20_autocomplete_userview.png)
+
+```xml
+<ListBox x:Name="UserList">
+    <local:UserView/>
+</ListBox>
+```
+
+Но если карточка находится, например, в папке…
+
+![Обозреватель решений с папкой cards, внутри которой UserView.xaml](../../assets/wpf/custom-controls/21_solution_explorer_cards_folder.png)
+
+…то тогда сначала надо добавить ссылку на эту папку, а потом уже писать тэг-карточку. Ссылки добавляются при помощи `xmlns:любоеимя="ссылка"`. Вместо ссылки можете просто имя папки написать, Visual Studio разберется как правильно писать.
+
+![XAML с xmlns:cardsssssssss=«cards» и оранжевая стрелка с подписью «имя папки»](../../assets/wpf/custom-controls/22_xmlns_typing_annotated.png)
+
+```xml
+xmlns:cardsssssssssssss="clr-namespace:тестыWPFFramework.cards"
+```
+
+![IntelliSense внутри ListBox предлагает UserView (cardsssssssss)](../../assets/wpf/custom-controls/23_autocomplete_cards_userview.png)
+
+```xml
+<ListBox x:Name="UserList" SelectionChanged="UserList_SelectionChanged">
+    <cardsssssssssssss:UserView/>
+    <cardsssssssssssss:UserView/>
+    <cardsssssssssssss:UserView/>
+</ListBox>
+```
+
+(Если у вас вместо отображения карточки появляется ошибка, просто нажмите `Ctrl+B`, или вверху, где файл/правка/вид, нажмите на «Сборка» → «Собрать решение».)
+
+Хорошо, создавать мы их теперь можем в неограниченном количестве. Но они все выглядят не так, как мы хотим — нет картинки (это ок, запустите — появится), вместо нормальных имен стоит та заглушка — Фамилия Имя Отчество. Как поставить нормальные значения из XAML?
+
+![Конструктор MainWindow с тремя одинаковыми карточками «Фамилия Имя Отчество» и XAML внизу](../../assets/wpf/custom-controls/24_designer_preview.png)
+
+### Привязки для свойств карточки
+
+Доступа к элементам и их свойствам отсюда у нас нет, так что нам опять нужно воспользоваться привязками.
+
+Привязки будут простыми. Из сложного — карточке нужно сказать, что её контекст данных — она сама. Перейдем в код `UserView` и напишем 1 строчку.
+
+```csharp
+public partial class UserView : UserControl
+{
+    public UserView()
+    {
+        InitializeComponent();
+        DataContext = this;
+    }
+}
+```
+
+Затем, чтобы сделать свойства, которые можно будет менять в XAML, нужно создать переменную. Хочу создать свойство для текста карточки — создам стринговую переменную `FIO`, обязательно с `get`/`set`.
+
+```csharp
+public partial class UserView : UserControl
+{
+    public string FIO { get; set; }
+
+    public UserView()
+    {
+        InitializeComponent();
+        DataContext = this;
+    }
+}
+```
+
+К нему привяжу свойство текста в карточке — вместо «Фамилия Имя Отчество».
+
+```xml
+<TextBlock x:Name="UserName" Text="Фамилия Имя Отчество"/>
+```
+
+```xml
+<TextBlock x:Name="UserName" Text="{Binding FIO}"/>
+```
+
+Пересоберу проект при помощи `Ctrl+B` или Сборка → Собрать решение, и теперь я смогу изменять это `FIO` в окне, используя свойство `FIO`.
+
+```xml
+<ListBox x:Name="UserList" SelectionChanged="UserList_SelectionChanged">
+    <cardsssssssssssss:UserView FIO="фамилия фамилия фамилия"/>
+    <cardsssssssssssss:UserView FIO="иванов иван иванович"/>
+    <cardsssssssssssss:UserView FIO="жаров жар жарович"/>
+</ListBox>
+```
+
+Это свойство также будет отображаться через интерфейс — в вкладке «Разное».
+
+![Панель «Свойства» в Visual Studio с разделом «Разное» и полем FIO = «жаров жар жарович»](../../assets/wpf/custom-controls/25_fio_property_pane.png)
+
+Если в интерфейсе что-то не отображается — опять пересоберите проект. А так — всё супер.
+
+![Запущенный MainWindow с тремя карточками «фамилия фамилия фамилия», «иванов иван иванович», «жаров жар жарович»](../../assets/wpf/custom-controls/26_final_run.png)
+
+## Полный код примера
+
+`UserView.xaml` (в папке `cards`) — карточка с картинкой и привязкой `FIO`:
+
+```xml
+<UserControl x:Class="тестыWPFFramework.cards.UserView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="112" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+        <Image Source="/Images/User.png" x:Name="UserImage"/>
+        <TextBlock x:Name="UserName" FontSize="20" Grid.Column="1"
+                   VerticalAlignment="Center" Margin="20"
+                   Text="{Binding FIO}"/>
+    </Grid>
+</UserControl>
+```
+
+`UserView.xaml.cs` — `DataContext = this` и публичное свойство `FIO`:
+
+```csharp
+using System.Windows.Controls;
+
+namespace тестыWPFFramework.cards
+{
+    public partial class UserView : UserControl
+    {
+        public string FIO { get; set; }
+
+        public UserView()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+    }
+}
+```
+
+`MainWindow.xaml` — `xmlns` на папку `cards`, `ListBox` с карточками, `ContextMenu` у `TextBox`:
+
+```xml
+<Window x:Class="тестыWPFFramework.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cards="clr-namespace:тестыWPFFramework.cards"
+        Title="MainWindow" Height="275" Width="403">
+    <Grid>
+        <ListBox x:Name="UserList" SelectionChanged="UserList_SelectionChanged">
+            <cards:UserView FIO="фамилия фамилия фамилия"/>
+            <cards:UserView FIO="иванов иван иванович"/>
+            <cards:UserView FIO="жаров жар жарович"/>
+        </ListBox>
+    </Grid>
+</Window>
+```
+
+`MainWindow.xaml.cs` — обработчик выбора карточки:
+
+```csharp
+using System.Windows;
+using System.Windows.Controls;
+using тестыWPFFramework.cards;
+
+namespace тестыWPFFramework
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void UserList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var card = UserList.SelectedItem as UserView;
+            if (card != null)
+                MessageBox.Show(card.FIO);
+        }
+    }
+}
+```

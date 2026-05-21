@@ -1,0 +1,391 @@
+---
+title: 'Привязки данных Binding в WPF: ElementName, DataContext, INotifyPropertyChanged и ObservableCollection'
+description: 'Привязка данных в WPF между двумя элементами интерфейса через ElementName и Path, привязка к переменной через DataContext и RelativeSource Self, режимы OneWay/TwoWay, реализация INotifyPropertyChanged для двусторонней привязки, ObservableCollection для DataGrid и собственные DataGridTextColumn.'
+group: 'MVVM'
+placeholder: false
+keywords:
+  - WPF
+  - Binding
+  - ElementName
+  - Path
+  - DataContext
+  - 'RelativeSource Self'
+  - 'Mode TwoWay'
+  - INotifyPropertyChanged
+  - OnPropertyChanged
+  - ObservableCollection
+  - DataGridTextColumn
+---
+
+Все наше время мы передавали данные на интерфейс при помощи `<название объекта>.<свойство>`. Это занимало достаточно большие куски кода, если нужно было передать много данных. Однако мы можем привязать данные из переменных так, чтобы значения сразу брались из переменных и отображались на интерфейсе, без постоянных `TextBox.Text` или `ListBox.ItemsSource`. Такая привязка данных называется `Binding`.
+
+Привязать данные мы можем несколькими способами:
+
+- От одного элемента интерфейса к другому элементу интерфейса (например, от текстового поля к текстовому блоку).
+- От переменной к элементу интерфейса.
+
+Начнем с первого — два элемента интерфейса, между которыми создана привязка данных.
+
+## Элемент к элементу
+
+Я создам маленькое приложение WPF со следующим интерфейсом:
+
+![VS XAML с MainWindow, текстовым полем InputTbx и блоком InfoTxt](../../assets/wpf/bindings/01_app_xaml.png)
+
+Здесь у меня есть текстовое поле, куда я буду вводить данные. Оно называется `InputTbx`. Также у меня есть текстовый блок для отображения вводимых данных — `InfoTxt`. Если я прямо сейчас запущу программу, никаких изменений вы не увидите — все будет работать, как и всегда, текстовое поле отдельно, текст отдельно.
+
+![Окно без привязки: TextBox с текстом «Привет, мир!», TextBlock с независимым текстом](../../assets/wpf/bindings/02_unbound_run.png)
+
+Наша же задача — привязать данные из текстового поля в текст. У нас постоянно должно обновляться свойство `Text`, поэтому именно к нему мы и будем привязывать данные. Чтобы привязать данные, внутри этого свойства необходимо прописать `{Binding}`. Прописываем мы это именно там, где хотим видеть постоянно обновляющийся текст, то есть в текстблоке.
+
+```xml
+<TextBlock Text="{Binding}" .../>
+```
+
+Далее нам необходимо каким-то образом привязать данные из текстового поля. Для этого к нему нужно обратиться при помощи `ElementName` — имя элемента интерфейса. `ElementName` мы пишем сразу после `Binding`, а значение указываем через равно, без двойных кавычек.
+
+![IntelliSense предлагает имена элементов после ElementName=](../../assets/wpf/bindings/03_elementname_intellisense.png)
+
+Я хочу привязать свой текст к текстовому полю, которое называется `InputTbx` — я так и напишу:
+
+```xml
+<TextBlock Text="{Binding ElementName=InputTbx}" .../>
+```
+
+Однако на нашем интерфейсе теперь мы можем увидеть следующее: в текстовое поле просто выводится информация о том, что это текстбокс. Внутри текстового поля очень много разных свойств и сейчас наша привязка просто не понимает к чему именно нужно обратиться.
+
+![В окне отображается «System.Windows.Controls.TextBox» — привязка взяла объект целиком](../../assets/wpf/bindings/04_textbox_class_name.png)
+
+Нам нужен текст из текстбокса. Значит мы должны указать путь, откуда привязка должна взять значения. Путь — `Path` — мы также прописываем внутри фигурных скобок привязки. Заметьте, что после названия элемента нам обязательно нужно поставить запятую, иначе привязка потеряется в значениях.
+
+Введем то, что мы хотим взять именно текст из текстового поля, и по итогу привязка будет выглядеть следующим образом:
+
+![IntelliSense с предложением свойства Text после Path=](../../assets/wpf/bindings/05_path_intellisense.png)
+
+Уже на этом моменте мы можем запускать наше приложение и увидеть, что текст меняется автоматически с текстовым полем.
+
+![Окно с синхронизированными «привет, мир!» в TextBox и TextBlock](../../assets/wpf/bindings/06_bound_synced.png)
+
+![То же окно при наборе «я поменялся автоматически»](../../assets/wpf/bindings/07_bound_typing.png)
+
+Кроме этих настроек внутри `Binding` существуют еще несколько свойств. Разберем самые простые из них в данном случае:
+
+- **StringFormat** — формат текста, который будет выводиться с привязкой. Например, если написать `StringFormat=Текст: {0}`, тогда перед нашим вводимым текстом всегда будет появляться слово «Текст: ». `{0}` в этом случае фигурирует как текст, к которому мы привязались. Сюда же можно вставить формат даты.
+
+```xml
+<TextBlock Text="{Binding ElementName=InputTbx, Path=Text, StringFormat=Текст: {0}}" .../>
+```
+
+![Окно: в TextBox «это мой текстик», в TextBlock «Текст: это мой текстик»](../../assets/wpf/bindings/08_stringformat_result.png)
+
+- **TargetNullValue** — если свойство, на которое мы биндим, равно `null`, тогда вместо свойства подставится вписанное значение.
+
+```xml
+<TextBlock Text="{Binding ElementName=InputTbx, Path=Text, TargetNullValue=Пусто}" .../>
+```
+
+## Элемент к переменной
+
+Разберем второй тип привязки — элемент к переменной и обратно. Эта вещь будет немного сложнее, так как теперь нам нужно сослаться на файл xaml.cs, где будут находиться переменные, к которым мы привязываемся. Чтобы сослаться на этот файл, необходимо прописать следующее в окне:
+
+![XAML Window с DataContext равным RelativeSource Self с подсветкой](../../assets/wpf/bindings/09_datacontext_self.png)
+
+Мы указываем контекст для нашего окна и ссылаемся на себя же, так как `MainWindow.xaml` и `MainWindow.xaml.cs` связаны.
+
+Затем, создадим переменную внутри `MainWindow.xaml.cs`, на которую мы будем ссылаться. У этой переменной обязательно должен быть [get; set;](/wpf/properties).
+
+Укажу сразу же значение для своей переменной `MyExample`:
+
+```csharp
+public partial class MainWindow : Window
+{
+    public string MyExample { get; set; } = "Это пример!";
+}
+```
+
+А далее, чтобы реализовать привязку, мы просто сразу после `Binding`, без указания чего-либо еще, пропишем название переменной. Если все прописано верно, тогда привязка сама предложит нам вписать нужную переменную.
+
+![XAML с Text «Binding MyE» и IntelliSense, предлагающим MyExample](../../assets/wpf/bindings/10_myexample_intellisense.png)
+
+Если мы запустим сейчас, у нас изменится наше текстовое поле. Однако сейчас, при изменении текстового поля, сама переменная меняться не будет.
+
+![Окно с двумя «Это пример!» — оба отображают значение переменной](../../assets/wpf/bindings/11_myexample_running.png)
+
+## Mode и направление привязки
+
+Для того, чтобы переменная менялась в две стороны — и из кода, и из интерфейса, ей необходимо указать режим привязки — `Mode`. `Mode` бывают разными:
+
+- **OneWay** — свойство объекта-приемника изменяется после изменения свойства объекта-источника. Пример: из переменной в интерфейс, но не обратно.
+- **OneTime** — свойство объекта-приемника установится по свойству объекта-источника только один раз, потом изменений не будет. Пример: один раз из переменной в интерфейс.
+- **OneWayToSource** — объект-приемник, в котором объявлена привязка, меняет объект-источник. Пример: из интерфейса в переменную, но не обратно.
+- **TwoWay** — изменения происходят в две стороны. Пример: из интерфейса в переменную и из переменной в интерфейс.
+- **Default** — по умолчанию (если меняется свойство `TextBox.Text`, то имеет значение `TwoWay`, в остальных случаях `OneWay`).
+
+Для нашего случая очень подойдет `TwoWay`. Установим это значение:
+
+![XAML с Mode=TwoWay подчёркнут](../../assets/wpf/bindings/12_mode_twoway_underlined.png)
+
+И теперь, по идее, наши изменения должны выполняться в две стороны — если я изменю переменную или если я изменю текстовое поле, в любом случае текст внутри текстового поля должен поменяться. Создам дополнительную кнопку, которая будет выводить `MessageBox` с значением переменной.
+
+![VS XAML с кнопкой «Показать содержимое» внизу](../../assets/wpf/bindings/13_with_button.png)
+
+Код внутри кнопки будет следующим:
+
+```csharp
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+    MessageBox.Show(MyExample);
+}
+```
+
+Если мы запустим приложение, изменим текстовое поле и нажмем на кнопку — содержимое переменной изменится. Ее текущее содержимое можно увидеть в всплывающем окне.
+
+![Окно с «Новое значение» в TextBox и в TextBlock, и MessageBox «Новое значение»](../../assets/wpf/bindings/14_new_value_msgbox.png)
+
+Однако попробуем вписать значение внутрь переменной и узнать, поменяется ли текстовое поле после этого:
+
+```csharp
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+    MessageBox.Show(MyExample);
+    MyExample = "Новое значение из кода";
+}
+```
+
+Запустим и два раза нажмем на кнопку. Сначала `MessageBox` отобразит нам то же самое значение, что было в текстовом поле. Однако при повторном вводе, когда значение из переменной изменится, `MessageBox` меняется, а текстовое поле нет.
+
+![Два кадра: TextBox с «Это пример!», MessageBox с «Новое значение из кода» — поле не обновилось](../../assets/wpf/bindings/15_var_change_msgbox.png)
+
+## INotifyPropertyChanged
+
+Это происходит по причине, что привязка из кода происходит только тогда, когда переменная создается. Если внутри нее просто меняется значение, привязка не знает, в какой момент оно изменилось, и не станет обновлять текстовые поля.
+
+Для того, чтобы привязка узнала, что мы изменили наше поле, необходимо использовать [интерфейс](/csharp/interface) `INotifyPropertyChanged`, который и будет обрабатывать изменения значений. Наследую его в окно.
+
+![Класс MainWindow, Window, INotifyPropertyChanged — INotifyPropertyChanged подчёркнут](../../assets/wpf/bindings/16_inotify_inheritance.png)
+
+Чтобы реализовать интерфейс, чуть ниже мне необходимо реализовать следующий код. Я его помещу в самый низ, чтобы он не мозолил мне глаза.
+
+![Код PropertyChanged и OnPropertyChanged с рукописными подписями «штука, имплементированная из интерфейса», «имя свойства, которое надо изменить», «запускаем событие»](../../assets/wpf/bindings/17_inotify_implementation_annotated.png)
+
+```csharp
+public event PropertyChangedEventHandler PropertyChanged;
+
+protected void OnPropertyChanged([CallerMemberName] string name = null)
+{
+    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+}
+```
+
+Чтобы мой код узнал, что значение изменилось, я должна буду постоянно вызывать `OnPropertyChanged` сразу после того, как я установила значение внутри свойства (переменной с `get; set;`). А значит, метод должен идти сразу после `set`. Если я меняю `set`, мне уже нужно полное свойство (более подробно в лекции про [get и set](/wpf/properties)). Заменю старое краткое свойство на полное, написав `propfull` и нажав два таба чуть ниже и видоизменив его под нужную мне переменную.
+
+![До и после: краткое свойство и развёрнутое полное со стрелкой между ними](../../assets/wpf/bindings/18_propfull_arrow.png)
+
+`OnPropertyChanged` пропишу сразу после `myExample = value`:
+
+```csharp
+private string myExample = "Это пример!";
+
+public string MyExample
+{
+    get { return myExample; }
+    set
+    {
+        myExample = value;
+        OnPropertyChanged();
+    }
+}
+```
+
+И уже теперь моя привязка будет работать в две стороны — как из переменной внутрь интерфейса, так и из интерфейса в переменную.
+
+![Четыре кадра: смена через интерфейс и смена через код — оба синхронизируют TextBox/TextBlock/MessageBox](../../assets/wpf/bindings/19_full_results.png)
+
+Если мы захотим привязать больше переменных, внутри каждого из них нужно будет писать `OnPropertyChanged();`.
+
+## Привязка листов
+
+Также, при работе со списками и [датагридами](/wpf/datagrid), вам понадобится привязывать листы с моделями. Рассмотрим, как это делать на примере датагрида. Создам новый простой интерфейс:
+
+![VS XAML с DataGrid и кнопкой «Добавить новый элемент»](../../assets/wpf/bindings/20_datagrid_xaml.png)
+
+А также простую модель данных, чью информацию я и буду выгружать в датагрид:
+
+```csharp
+namespace vipief
+{
+    public class Colour
+    {
+        public string Name { get; set; }
+        public string Hexademical { get; set; }
+    }
+}
+```
+
+Как источник данных, мне понадобится лист с этой моделью `Colour`. Однако раз я хочу привязать этот лист к датагриду, мне сразу нужно прописать его правильно — полное свойство при помощи `propfull`, внутри которого будет `OnPropertyChanged`.
+
+Свойство будет являться [листом](/csharp/collections) с моделью и называться `Colours`. Внутри приватной переменной будет новый лист:
+
+```csharp
+private List<Colour> colours = new List<Colour>();
+
+public List<Colour> Colours
+{
+    get { return colours; }
+    set
+    {
+        colours = value;
+        OnPropertyChanged();
+    }
+}
+```
+
+Привяжу источник элементов датагрида к этой переменной:
+
+![XAML DataGrid с CanUserAddRows False и ItemsSource Binding Colours — подпись «привязываю к public свойству»](../../assets/wpf/bindings/21_datagrid_binding_colours.png)
+
+А также пропишу создание заглушек внутрь моего листа по нажатию на кнопку:
+
+```csharp
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+    Colour c = new Colour();
+    c.Name = "заглушка";
+    c.Hexademical = "FFFFFF";
+    Colours.Add(c);
+}
+```
+
+Если я запущу сейчас и нажму несколько раз на кнопку, таблица не обновится сразу. Чтобы она обновилась, мне нужно отфильтровать одну из колонок, а это не самое лучшее решение.
+
+![DataGrid с заголовками Name и Hexademical, но без строк после нажатий](../../assets/wpf/bindings/22_table_empty.png)
+
+![После клика по заголовку строки появились — это не должно требоваться](../../assets/wpf/bindings/23_table_no_update.png)
+
+## ObservableCollection
+
+Чтобы исправить эту проблему, нам необходимо заменить `List` на `ObservableCollection` — коллекция, которая может просматриваться. Такое решение будет лучшим для привязок.
+
+```csharp
+private ObservableCollection<Colour> colours = new ObservableCollection<Colour>();
+
+public ObservableCollection<Colour> Colours
+{
+    get { return colours; }
+    set
+    {
+        colours = value;
+        OnPropertyChanged();
+    }
+}
+```
+
+После замены, элементы сами будут ставиться внутрь датагрида.
+
+![DataGrid с двумя строками «заглушка» / «FFFFFF» сразу после нажатий](../../assets/wpf/bindings/24_observable_works.png)
+
+## Кастомизация датагрида
+
+Если я хочу изменить названия столбцов для датагрида, я также могу это реализовать. Для этого укажу, что колонки я буду создавать вручную:
+
+```xml
+<DataGrid CanUserAddRows="False" ItemsSource="{Binding Colours}" AutoGenerateColumns="False">
+```
+
+И создам 2 колонки со своими названиями. Чтобы у меня значения шли внутрь них из моей модели, воспользуюсь свойством `Binding` и внутрь напишу привязку к названиям моих свойств — `Name` и `Hexademical` соответственно.
+
+![DataGrid Columns с двумя DataGridTextColumn — обведено](../../assets/wpf/bindings/25_custom_columns_annotated.png)
+
+Работать будет также, но названия столбцов уже будут изменены.
+
+![DataGrid с заголовками «Название» / «HEX цвет» и двумя строками «заглушка»](../../assets/wpf/bindings/26_custom_column_headers.png)
+
+## Полный код примера
+
+`Colour.cs` — модель с двумя свойствами:
+
+```csharp
+namespace vipief
+{
+    public class Colour
+    {
+        public string Name { get; set; }
+        public string Hexademical { get; set; }
+    }
+}
+```
+
+`MainWindow.xaml` с DataContext на себя и кастомным датагридом:
+
+```xml
+<Window x:Class="vipief.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="MainWindow" Height="239" Width="547">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DataGrid CanUserAddRows="False"
+                  ItemsSource="{Binding Colours}"
+                  AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Название" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="HEX цвет" Binding="{Binding Hexademical}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button Grid.Row="1" Content="Добавить новый элемент" Click="Button_Click"/>
+    </Grid>
+</Window>
+```
+
+`MainWindow.xaml.cs` с `INotifyPropertyChanged` и `ObservableCollection`:
+
+```csharp
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows;
+
+namespace vipief
+{
+    public partial class MainWindow : Window, INotifyPropertyChanged
+    {
+        private ObservableCollection<Colour> colours = new ObservableCollection<Colour>();
+
+        public ObservableCollection<Colour> Colours
+        {
+            get { return colours; }
+            set
+            {
+                colours = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Colour c = new Colour();
+            c.Name = "заглушка";
+            c.Hexademical = "FFFFFF";
+            Colours.Add(c);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
+}
+```

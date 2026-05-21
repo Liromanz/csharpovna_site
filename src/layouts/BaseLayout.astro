@@ -54,17 +54,25 @@ const currentSection: SectionId = section ?? detectSection(Astro.url.pathname);
       publishedTime={publishedTime}
       jsonLd={jsonLd}
     />
+    <script is:inline>
+      // Восстанавливаем свёрнутое состояние сайдбара до первого пейнта (без FOUC).
+      try {
+        if (localStorage.getItem("codedocss:sidebar-collapsed") === "true") {
+          document.documentElement.dataset.sidebarCollapsed = "true";
+        }
+      } catch (_) {}
+    </script>
     <slot name="head" />
   </head>
   <body class="min-h-screen">
-    <div class="flex min-h-screen">
+    <Header currentSection={currentSection} />
+
+    <div class="flex min-h-[calc(100vh-var(--spacing-header))]">
       {!hideSidebar && (
         <Sidebar currentSection={currentSection} currentSlug={currentSlug} />
       )}
 
       <div class="flex min-w-0 flex-1 flex-col">
-        <Header currentSection={currentSection} />
-
         <main class="flex-1">
           <slot />
         </main>

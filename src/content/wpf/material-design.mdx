@@ -1,0 +1,354 @@
+---
+title: 'Material Design и новые окна в WPF: Show, ShowDialog и DialogResult'
+description: 'Подключение Material Design к WPF-проекту через NuGet и App.xaml, создание новых окон и страниц через Add → Window (WPF), открытие окон через Show и ShowDialog, передача данных через свойства и конструктор, возврат результата через DialogResult.'
+group: 'Стилизация и многооконность'
+placeholder: false
+keywords:
+  - WPF
+  - Material Design
+  - MaterialDesignThemes
+  - 'App.xaml'
+  - 'xmlns:materialDesign'
+  - новое окно
+  - Show
+  - ShowDialog
+  - DialogResult
+  - InitializeComponent
+---
+
+## Material Design
+
+Большинство используют сейчас обычные системные элементы интерфейса, не придавая значения их виду. Однако у нас есть много специальных библиотек, позволяющих настроить вид наших кнопок. Разберем одну из них — Material Design.
+
+Material Design используется для создания интерфейса на мобильных приложениях, а также на сайтах, используя Bootstrap. Если мы хотим создать приложение с похожим интерфейсом на всех платформах, Material Design будет одним из хороших выборов шаблонных элементов интерфейса.
+
+![Обзор элементов интерфейса Material Design: карточки, кнопки, поля ввода, чипы](../../assets/wpf/material-design/a01_md_overview.png)
+
+Для того, чтобы начать с ним работать, вам необходимо скачать проект, который я скинула на диск:
+
+[drive.google.com/drive/folders/1KanftRQWGCHxZ6A6coNcip0KGkikD61O](https://drive.google.com/drive/folders/1KanftRQWGCHxZ6A6coNcip0KGkikD61O?usp=share_link)
+
+Это архив с WPF-проектом, где вы сможете быстро ознакомиться со всеми элементами интерфейса и скопировать XAML понравившейся кнопки или текстового поля к себе в проект. Давайте разберемся как работать с этим проектом.
+
+Прежде всего, его нужно скачать и разархивировать куда угодно. После разархивации нам необходимо открыть следующий путь: разархивированная папка → Release → любая версия, которая у вас есть в Visual Studio → `MaterialDesignDemo.exe`.
+
+Для того, чтобы запустить эту программу, у вас должен быть установлен .NET 6.0, 7.0, 8.0 или .NET Framework 4.7.2, любая версия на выбор. Версию вы можете проверить, когда создаете WPF-приложение, если при выборе версии проекта есть хотя бы один из этих, супер.
+
+![Содержимое папки Release/net6.0-windows с MaterialDesignDemo.exe](../../assets/wpf/material-design/a02_release_folder.png)
+
+Либо вы можете пойти другим путем и запустить приложение прямо через Visual Studio. Для этого вернитесь в самое начало, в папку, которую вы разархивировали, и найдите там файл `MaterialDesignTooklit.slnf`. Через него вы запустите проект.
+
+![Файл MaterialDesignToolkit.Wpf.slnf в корне архива](../../assets/wpf/material-design/a03_slnf.png)
+
+В самой Visual Studio вам необходимо из списка запускаемых приложений (выпадающий список чуть левее кнопки запуска) выбрать приложение `MaterialDesignDemo` и запустить его.
+
+![Список запускаемых приложений с подсветкой MaterialDesignDemo](../../assets/wpf/material-design/a04_select_demo.png)
+
+По итогу, после того как мы запустим приложение, нас встретит вот такой интерфейс. Отсюда мы можем посмотреть источник этого приложения — ссылка на GitHub — и контакты создателя Material Design.
+
+![Главное окно Material Design Toolkit с ссылками на GitHub и поддержку](../../assets/wpf/material-design/a05_demo_welcome.png)
+
+Но нам это все глубоко неинтересно, нам интересно боковое меню в левом верхнем углу. Уже оттуда мы можем найти все элементы интерфейса, которые нам нужны.
+
+![Сайдбар Material Design Toolkit с пунктами Home, Buttons, Cards, Chips, Color Tool](../../assets/wpf/material-design/a06_demo_sidebar.png)
+
+Например, я хочу выбрать себе красивую кнопку. Для этого выберем пункт «Buttons» и найдем здесь кнопки на любой вкус и цвет.
+
+![Раздел Buttons с десятками вариантов кнопок: круглые, плоские, цветные, обводные](../../assets/wpf/material-design/a07_demo_buttons.png)
+
+Цвет и содержимое каждого из этого мы сможем менять, за это не переживайте.
+
+Чтобы расположить эти элементы интерфейса у себя в приложении, у нас справа каждого элемента есть кнопка `</>`. Если мы на нее нажмем, мы увидим представление этой кнопки в XAML. Скопировав и вставив эту кнопку в свой проект, мы уже (почти) сможем с ней работать как с самой обычной кнопкой.
+
+Например, я создам совсем пустой проект в WPF и попробую перетащить туда выбранную мной кнопку — Dark. Однако что-то не так. Она совершенно не выглядит так, как было в Material Design, а сам XAML выдает ошибки. В чем проблема?
+
+![Скопированная кнопка отображается как обычная белая, XAML подсвечен красным](../../assets/wpf/material-design/a08_button_pasted_broken.png)
+
+Проблема в том, что для работы с Material Design мы также должны докачать пакет NuGet, чтобы наш проект распознавал все виды кнопок. Давайте откроем управление пакетами NuGet с помощью ПКМ по проекту → Управление пакетами NuGet.
+
+![Контекстное меню проекта с пунктом «Управление пакетами NuGet…»](../../assets/wpf/material-design/a09_nuget_menu.png)
+
+В пакетах нам необходимо найти и докачать `MaterialDesignThemes` — версия не важна.
+
+![NuGet с найденным пакетом MaterialDesignThemes от James Willock](../../assets/wpf/material-design/a10_nuget_themes.png)
+
+После докачки нам необходимо вставить следующий код в `App.xaml`. ЗАМЕТЬТЕ, что вместо точек после `<Application` у вас должно идти содержимое вашего тэга `Application`. Т.е., если кратко, как только вы заходите в `App.xaml`, вы видите пустой тэг `Application.Resources`. Его вы заменяете на тот `Application.Resources`, что я скинула ниже, а в тэг `Application`, после `StartupUri`, вам необходимо добавить ссылку `xmlns:materialDesign`.
+
+```xml
+<Application . . .
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+```
+
+По итогу, у меня это выглядит так.
+
+![App.xaml с подписями «вот это не менять» и «вот это я меняла — скопировала из лекции»](../../assets/wpf/material-design/a11_appxaml_annotated.png)
+
+С `App.xaml` закончили, осталось только добавить эту библиотеку непосредственно в окно. Если в коде все библиотеки мы добавляли через `using`, то в XAML мы добавляем их через `xmlns:имя` в самом верхнем тэге — в данном случае `Window`.
+
+Добавить необходимо следующую библиотеку:
+
+```xml
+xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+```
+
+Я добавлю эту библиотеку сразу после первой строчки, чтобы все библиотеки были визуально в одной группке.
+
+![Window-тэг с подключённым xmlns:materialDesign](../../assets/wpf/material-design/a12_window_xmlns.png)
+
+В XAML пока все также тихо — кнопки не отображаются. Чтобы все заработало, нам нужно либо собрать проект без сборки — `Ctrl + B` — либо запустить проект, и мы увидим, какая красивая кнопка у нас появилась!
+
+![Кнопка DARK теперь стилизована Material Design](../../assets/wpf/material-design/a13_dark_button.png)
+
+Внутри самой кнопки, в XAML, я могу удалить все ненужные свойства, которые я вижу. Например, мне вообще не нужно какое-то странное значение в `Width`, `ToolTip` и `IsEnabled` — я человек простой, я хочу красивую кнопочку со стилем и текстом внутри.
+
+![Сравнение «до и после»: верхняя кнопка с лишними свойствами помечена крестиками, нижняя — чистая](../../assets/wpf/material-design/a14_button_clean_annotated.png)
+
+И по итогу у нас будет красивая кнопочка с нашим текстом.
+
+![Белая кнопка «кнопочка!» в стиле Material Design Light](../../assets/wpf/material-design/a15_button_white.png)
+
+![Фиолетовая кнопка «кнопочка!» в Material Design](../../assets/wpf/material-design/a16_button_purple.png)
+
+Таким же образом мы можем создавать любой элемент интерфейса, который найдем в программе Material Design. Если мы не хотим использовать стиль этой кнопки, нам нужно убрать свойство `Style`. События для этих кнопок делаются также, как и для обычных элементов управления. Это на самом деле и есть обычный элемент управления, мы просто добавляем ему стиль.
+
+## Новые окна
+
+Все приложения, которые мы используем, используют далеко не одно окно. Однако практические, которые мы писали, все имели одно окно. Тогда встает вопрос — как создать новое окно и отобразить его? Давайте разбираться.
+
+Я создам новый пустой проект, где будет только одна кнопка — открыть новое окно. Интерфейс может быть любым, но сейчас, мне нужна какая-то кнопка, при нажатии на которую, будет открываться новое окно.
+
+![MainWindow с одной кнопкой «Открыть новое окошко»](../../assets/wpf/material-design/b01_open_btn_window.png)
+
+Чтобы у меня открывалось новое окно, мне необходимо его создать. Создать новое окно мы можем также, как раньше создавали новые классы — просто через добавление файла. Нажмем ПКМ по проекту, выберем «Добавить» и выберем «Окно (WPF)».
+
+![Контекстное меню «Добавить → Окно (WPF)» с цифрами 1, 2, 3](../../assets/wpf/material-design/b02_add_menu.png)
+
+В появившемся окне снова подтвердим, что мы хотим создать окно и дадим ему название. В WPF новые окна принято называть как `____Window`.
+
+![Диалог добавления элемента: выбран тип «Окно (WPF)», имя «MyNewWindow»](../../assets/wpf/material-design/b03_add_window_dialog.png)
+
+Новое окно имеет всю ту же структуру, что и `MainWindow` (логично, и то и то — окно) — тот же XAML, тот же xaml.cs и прочее. Здесь мы также можем реализовывать любой интерфейс и любые события, только хранится они уже будут в файле определенного окна (событие окна `MyNewWindow.xaml` будут хранится в `MyNewWindow.xaml.cs`, а не в `MainWindow.xaml.cs`).
+
+![Файл MyNewWindow.xaml открыт в VS, видно его в обозревателе решений](../../assets/wpf/material-design/b04_mynewwindow_view.png)
+
+Чтобы открыть это новое окно, его необходимо создать как сложную переменную внутри окна, из которого мы хотим вызвать новое окно. Скажем, я из окна `MainWindow` по нажатию на кнопку хочу открыть `MyNewWindow`. Тогда, обработаем событие нажатия на кнопку, и создадим там переменную типа данных `MyNewWindow`.
+
+```csharp
+private void NewWindowBtn_Click(object sender, RoutedEventArgs e)
+{
+    MyNewWindow window = new MyNewWindow();
+}
+```
+
+Если я хочу его отобразить, я использую эту переменную `window`, а именно, скажу показать мне окно — вызову метод `Show()`.
+
+![Код с window.Show(); подчёркнут](../../assets/wpf/material-design/b05_window_show_annotated.png)
+
+По итогу, у меня отобразится это новое окно.
+
+![Два окна на экране: главное MainWindow и поверх него MyNewWindow](../../assets/wpf/material-design/b06_two_windows.png)
+
+Если я хочу закрыть текущее окно, я напишу `this.Close()` или просто `Close()`. То же самое я могу проделать для всех классов, которые наследуют класс `Window` — этот метод хранится внутри родительского класса.
+
+![Code с Close(); и комментарием «закрывает текущее окно»](../../assets/wpf/material-design/b07_close_annotated.png)
+
+## Передача данных в новое окно
+
+Если я хочу задать значение для какой-то переменной или использовать какой-то элемент интерфейса до того, как открылось окошко (например, изменить текст, или запихнуть в переменную значение), я также буду делать это с помощью переменной `window`. Например, я дам имя текстовому блоку во втором окне.
+
+![TextBlock с x:Name="NewTxt" подчёркнутый](../../assets/wpf/material-design/b08_textblock_name.png)
+
+И создам публичную глобальную переменную (использовать я ее не буду, просто создам, чтобы закинуть туда значение).
+
+![public string myVar внутри класса MyNewWindow](../../assets/wpf/material-design/b09_myvar_field.png)
+
+Как я уже сказала, чтобы использовать эти переменные, я обращусь к ним через переменную с моим окном (в моем случае `window`). Обращусь как `window.переменная`.
+
+![Установка window.myVar и window.NewTxt.Text перед Show()](../../assets/wpf/material-design/b10_set_window_values.png)
+
+Итого, мы увидим следующее, если откроем наше окошко.
+
+![MyNewWindow с текстом «Текст, который я передала из первого окна»](../../assets/wpf/material-design/b11_text_from_first.png)
+
+Также мы можем передавать значения с помощью конструктора. Мы помним, что по умолчанию у нас есть вот такой вот пустой конструктор, который просто создает окно интерфейса с помощью метода `InitializeComponent()`.
+
+```csharp
+public MyNewWindow()
+{
+    InitializeComponent();
+}
+```
+
+Как и в обычном конструкторе, мы можем задать ему параметры, которые будем передавать при создании переменной.
+
+![Конструктор MyNewWindow с параметром string text и присваиванием myVar = text](../../assets/wpf/material-design/b12_constructor_param_annotated.png)
+
+Тогда и объявление переменной `window` изменится, так как теперь нам нужно в наш конструктор что-то передать.
+
+![Вызов new MyNewWindow("значение") с подписью «я убрала строчку window.myVar...»](../../assets/wpf/material-design/b13_call_with_param.png)
+
+## ShowDialog и DialogResult
+
+Однако, если мы закроем это новое окно, мы не узнаем, закрылось ли оно или нет. А что, если это новое окно было диалоговым, и нам нужно узнать, какая информация была в окошке, когда оно закрылось, или что выбрал пользователь при закрытии? Тогда нам обязательно знать, когда закрылось окно.
+
+Раз уж мы сказали, что окно подразумевается как диалоговое, тогда и откроем мы его с помощью `ShowDialog()`.
+
+![Замена window.Show() на window.ShowDialog()](../../assets/wpf/material-design/b14_showdialog.png)
+
+Я видоизменю свое второе окно, чтобы оно было больше похоже на диалоговое с выбором «Да» или «Нет».
+
+![MyNewWindow с текстом «поработать сегодня?» и двумя кнопками Да и Нет](../../assets/wpf/material-design/b15_dialog_yes_no.png)
+
+К кнопкам «Да» и «Нет» я привяжу события нажатия — в случае, если я нажала «Да», глобальная переменная `choose` будет равна «Да». В случае если нет — переменная равна «Нет».
+
+```csharp
+public partial class MyNewWindow : Window
+{
+    public string choose;
+
+    public MyNewWindow()
+    {
+        InitializeComponent();
+    }
+
+    private void YesBtn_Click(object sender, RoutedEventArgs e)
+    {
+        choose = "Да";
+        DialogResult = true;  // чтобы закрыть окно, будто все ок
+    }
+
+    private void NoBtn_Click(object sender, RoutedEventArgs e)
+    {
+        choose = "Нет";
+        DialogResult = false; // чтобы закрыть окно, будто нажали на кнопку «отмена»
+    }
+}
+```
+
+Заметьте, что я также добавила `DialogResult = true` и `DialogResult = false` в эти события. Что это такое?
+
+`DialogResult` позволяет закрыть окно с каким-либо результатом — `true`, если мы подтвердили действие (например такие вещи как «да», «установить» в установщиках, «удалить» в деинсталляторах, «подтвердить» — все они будут иметь `DialogResult = true`), и `false`, если мы действие отменили («нет», «отмена», «прервать», «остановить» — все это будет иметь `DialogResult = false`). Если мы просто закроем окно через крестик, тогда `DialogResult` будет равен `false`. По умолчанию он равен `null`.
+
+Здесь я хочу иметь подобную логику — сказать предыдущему окну, что я либо подтвердила действие, либо нет. Как только код дойдет до `DialogResult` или `Close()` (в этом случае, `DialogResult` будет равен `null`), окно закроется, и мы вернемся к выполнению кода в первом окне. Т.е. пока второе окно не закрыто, код в первом окне приостанавливается.
+
+Допишу код в первом окне — я хочу вывести в MessageBox результат из своего диалогового окна.
+
+```csharp
+private void NewWindowBtn_Click(object sender, RoutedEventArgs e)
+{
+    MyNewWindow window = new MyNewWindow();
+    window.ShowDialog();
+
+    MessageBox.Show(window.choose);
+}
+```
+
+Пока второе окно не закроется, мы останавливаемся на строчке `window.ShowDialog();`.
+
+![Диалоговое окно открыто, поток кода остановлен на ShowDialog со стрелкой «мы пока вот здесь»](../../assets/wpf/material-design/b16_waiting_for_dialog.png)
+
+Как только мы что-то выберем (да, нет, закрыть окно), код пойдет дальше, в нашем случае — к MessageBox.
+
+![После выбора в диалоге появился MessageBox «Да» со стрелкой «второе окно закрылось, появился messagebox»](../../assets/wpf/material-design/b17_after_dialog.png)
+
+Если я хочу сделать разную логику в зависимости от того, что было в `DialogResult` (`true`, `false` или `null` (если мы просто закрыли через `Close()`)), мне нужно сохранить результат `ShowDialog()` в переменную. Она будет иметь тип данных `bool?` — тот, что принимает `true`, `false` или `null`. И уже от него, можно делать разные условия.
+
+![Код с тремя ветвями if/else if для true, false и null с цифрами 1, 2, 3](../../assets/wpf/material-design/b18_three_conditions.png)
+
+Результат будет отличаться в зависимости от того, с каким значением `DialogResult` закрылось окно.
+
+![Два запуска: «нажали на Да» → MessageBox «закрылось с true», «нажали на Нет или крестик» → «закрылось с false»](../../assets/wpf/material-design/b19_two_results.png)
+
+## Полный код примера
+
+`MyNewWindow.xaml` с двумя кнопками для диалогового окна:
+
+```xml
+<Window x:Class="WpfApp1.MyNewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MyNewWindow" Height="200" Width="300">
+    <StackPanel Margin="20" VerticalAlignment="Center">
+        <TextBlock x:Name="NewTxt" Text="поработать сегодня?"
+                   HorizontalAlignment="Center" Margin="0,0,0,15"/>
+        <Button x:Name="YesBtn" Content="Да"    Click="YesBtn_Click" Margin="0,0,0,5"/>
+        <Button x:Name="NoBtn"  Content="Нет"   Click="NoBtn_Click"/>
+    </StackPanel>
+</Window>
+```
+
+`MyNewWindow.xaml.cs` с обработчиками кнопок и `DialogResult`:
+
+```csharp
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MyNewWindow : Window
+    {
+        public string choose;
+
+        public MyNewWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void YesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            choose = "Да";
+            DialogResult = true;
+        }
+
+        private void NoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            choose = "Нет";
+            DialogResult = false;
+        }
+    }
+}
+```
+
+`MainWindow.xaml.cs` с разной логикой на каждый возможный результат:
+
+```csharp
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void NewWindowBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MyNewWindow window = new MyNewWindow();
+            bool? result = window.ShowDialog();
+
+            if (result == true)
+            {
+                MessageBox.Show("закрылось с true");
+            }
+            else if (result == false)
+            {
+                MessageBox.Show("закрылось с false");
+            }
+            else if (result == null)
+            {
+                MessageBox.Show("было null!");
+            }
+        }
+    }
+}
+```

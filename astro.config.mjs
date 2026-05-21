@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import { fileURLToPath } from "node:url";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import node from "@astrojs/node";
@@ -19,6 +20,11 @@ export default defineConfig({
   trailingSlash: "ignore",
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
+      },
+    },
   },
   integrations: [
     expressiveCode({

@@ -1,0 +1,285 @@
+---
+title: 'CancellationToken в WPF: отмена задач через CancellationTokenSource, статусы Task и OperationCanceledException'
+description: 'Отмена асинхронных задач через CancellationToken и CancellationTokenSource вместо bool-флага, проверка IsCancellationRequested и принудительное прерывание через ThrowIfCancellationRequested. Статусы Task — WaitingForActivation, RanToCompletion, Canceled — и обработка OperationCanceledException через try/catch. Освобождение ресурсов через Dispose.'
+group: 'Асинхронность и сеть'
+placeholder: false
+keywords:
+  - WPF
+  - CancellationToken
+  - CancellationTokenSource
+  - 'IsCancellationRequested'
+  - 'ThrowIfCancellationRequested'
+  - OperationCanceledException
+  - Task
+  - 'Task.Status'
+  - WaitingForActivation
+  - RanToCompletion
+  - Canceled
+  - Dispose
+---
+
+Перед нами, ещё с момента изучения `Thread`, стоял вопрос — как закончить поток? `Thread.Stop()` и `Thread.Abort()` давно не поддерживается, а оставлять поток открытым не хочется. Тогда что делать?
+
+Начнем с того, что теперь, вместо потоков, мы используем [асинхронное программирование и Task](/wpf/async-await). Их тоже нужно отменять, так что разберем на их примере.
+
+## От `bool` к `CancellationTokenSource`
+
+Возьмем пример из предыдущей лекции. Там у нас был бесконечный цикл, сделанный при помощи переменной `isWorking`, и, если мы хотели отменить действие, мы давали ей значение `false`, и да, действие отменялось.
+
+![Код из предыдущей лекции: private bool isWorking, Button_Click с await Tochki(), Button_Click_1 с isWorking = false, async Task Tochki с while(isWorking) — оранжевые подписи к каждому методу](../../assets/wpf/cancellation/01_prev_lecture_code_annotated.png)
+
+Но если я хочу иметь немного больше контроля над ситуацией (посмотреть, отменяется ли он в данный момент, уже отменился или ещё продолжается), я буду использовать `CancellationToken`.
+
+Сам токен — некий `enum`, где хранятся состояния токена на данный момент. Чтобы мы смогли вызвать отмену токена, нам нужно создать `CancellationTokenSource` — источник. У каждой задачи свой источник токена.
+
+Заменю `bool` переменную на `CancellationTokenSource`.
+
+![Сравнение: слева private bool isWorking, оранжевая стрелка, справа private CancellationTokenSource isWorking](../../assets/wpf/cancellation/02_bool_to_tokensource_annotated.png)
+
+Вместо `isWorking = false` теперь я могу вызвать отмену — `isWorking.Cancel()`.
+
+![Сравнение: слева isWorking = false, оранжевая стрелка, справа isWorking.Cancel()](../../assets/wpf/cancellation/03_false_to_cancel_annotated.png)
+
+А сам цикл я заменю на следующий вызов.
+
+![Сравнение: слева while(isWorking), оранжевая стрелка с подписью «Пока НЕ запрошена отмена», справа while(!isWorking.IsCancellationRequested)](../../assets/wpf/cancellation/04_while_replaced_annotated.png)
+
+Если мы оставим всё как есть, тогда у нас появится ошибка — токен был `null`. Нам нужно создавать токен каждый раз перед новой задачей.
+
+```csharp
+private async void Button_Click(object sender, RoutedEventArgs e)
+{
+    zagruzkaGrid.Visibility = Visibility.Visible;
+    isWorking = new CancellationTokenSource();
+    await Tochki();
+    zagruzkaGrid.Visibility = Visibility.Collapsed;
+}
+```
+
+## Передача токена параметром
+
+Так и правда можно оставить код, но это будет несколько неправильно. Наш метод всё ещё зависит от большой глобальной переменной, а метод должен принимать в себя любой токен отмены в любой момент. Для этого вместо глобальной переменной мы сделаем параметр — метод будет принимать в себя токен, чтобы он не зависел ни от каких внешних факторов.
+
+![Сравнение: слева Tochki() без параметров, оранжевая стрелка, справа Tochki(CancellationToken token) с while(!token.IsCancellationRequested)](../../assets/wpf/cancellation/05_param_token_annotated.png)
+
+![Сравнение: слева await Tochki();, оранжевая стрелка, справа await Tochki(isWorking.Token);](../../assets/wpf/cancellation/06_pass_token_annotated.png)
+
+(На всякий случай, если мы не хотим всегда передавать токен, мы всегда в параметре можем написать `CancellationToken token = default`.)
+
+В полном формате наш код будет выглядеть следующим образом.
+
+```csharp
+public partial class MainWindow : Window
+{
+    private CancellationTokenSource isWorking;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private async void Button_Click(object sender, RoutedEventArgs e)
+    {
+        zagruzkaGrid.Visibility = Visibility.Visible;
+        isWorking = new CancellationTokenSource();
+        await Tochki(isWorking.Token);
+        zagruzkaGrid.Visibility = Visibility.Collapsed;
+    }
+
+    private void Button_Click_1(object sender, RoutedEventArgs e)
+    {
+        isWorking.Cancel();
+    }
+
+    private async Task Tochki(CancellationToken token)
+    {
+        zagruzkaText.Text = "";
+
+        while (!token.IsCancellationRequested)
+        {
+            zagruzkaText.Text += ".";
+            await Task.Delay(50);
+        }
+    }
+}
+```
+
+## Статусы Task
+
+Однако, что это нам дало? Работает ведь так же, как работало с `bool`. А разница есть. Чтобы её увидеть, нам необходимо посмотреть статус нашего таска. Сделаем следующее.
+
+Раз таск возвращает значение `Task`, значит её можно поместить в переменную. Я создам глобальную переменную типа данных `Task`, чтобы у меня была возможность посмотреть на этот метод отовсюду.
+
+![Код класса с private CancellationTokenSource isWorking; и private Task task; — оранжевое подчёркивание у task](../../assets/wpf/cancellation/07_global_task_annotated.png)
+
+Вместо того, чтобы ожидать этот метод, я запишу его в переменную `task`. Если я записываю его в такую переменную, я не могу ожидать окончание этого метода, так как при `await` метод начнет возвращать `void`.
+
+![Сравнение: слева await Tochki(isWorking.Token);, оранжевая стрелка, справа task = Tochki(isWorking.Token);](../../assets/wpf/cancellation/08_assign_to_task_annotated.png)
+
+Чуть ниже пропишем ожидание этой задачи.
+
+```csharp
+task = Tochki(isWorking.Token);
+await task;
+```
+
+Теперь у меня есть доступ к этому методу. Воспользуюсь моей бесполезной кнопкой «Кликер». Дам ей название — `statusBtn` — и обработаю нажатие на неё.
+
+Как только я нажимаю на эту кнопку, текст внутри неё будет меняться на статус моего таска при помощи `task.Status`.
+
+![XAML фрагмент с Button x:Name=statusBtn Content=«я кликер» Click=statusBtn_Click](../../assets/wpf/cancellation/09_statusbtn_xaml.png)
+
+```csharp
+private void statusBtn_Click(object sender, RoutedEventArgs e)
+{
+    statusBtn.Content = task.Status;
+}
+```
+
+Теперь я могу посмотреть статус моей кнопки. На данный момент у меня есть 2 статуса —
+
+`WaitingForActivation` — метод в данный момент идёт.
+
+![Окно MainWindow: кнопка «отмена операции» сверху, кнопка с текстом WaitingForActivation, справа точки загрузки, снизу «Кнопка которая заблокирует мне всё»](../../assets/wpf/cancellation/10_waiting_for_activation.png)
+
+`RanToCompletion` — метод закончил своё выполнение. Такой статус может заработать в двух случаях — если метод правда закончил своё действие (например, у меня был не бесконечный цикл, а цикл `for` на 50 оборотов), и если я прервала его при помощи условия `token.IsCancellationRequested`. Во втором случае он также выдаст этот статус, потому что я просто прервала цикл — метод сам, без ошибок, дошел до конца.
+
+![Окно MainWindow: кнопка с текстом RanToCompletion после нажатия на «отмена операции», точки остановились](../../assets/wpf/cancellation/11_ran_to_completion.png)
+
+Чтобы посмотреть третий статус, я немного видоизменю метод `Tochki`. Создам бесконечный цикл `while(true)`, и если токен запросил отмену — выкину ему ошибку об отмене.
+
+![Код метода Tochki со while(true) и if(token.IsCancellationRequested) token.ThrowIfCancellationRequested(); — оранжевая скобка слева охватывает оба блока](../../assets/wpf/cancellation/12_throw_if_cancellation_annotated.png)
+
+```csharp
+private async Task Tochki(CancellationToken token)
+{
+    zagruzkaText.Text = "";
+
+    while (true)
+    {
+        if (token.IsCancellationRequested)
+            token.ThrowIfCancellationRequested();
+
+        zagruzkaText.Text += ".";
+        await Task.Delay(50);
+    }
+}
+```
+
+В этом случае, мы увидим третий статус задачи.
+
+`Canceled` — задача отменена принудительно, метод закончился не самостоятельно, а из-за внутренней ошибки `OperationCanceledException`.
+
+![Окно MainWindow: кнопка с текстом Canceled](../../assets/wpf/cancellation/13_canceled_status.png)
+
+## Обработка OperationCanceledException
+
+Эту ошибку можно обработать при помощи [try-catch](/csharp/trycatch). Скажем, при отмене, я напишу в текстовом поле слово «Отменено». Саму ошибку я буду обрабатывать там же, где ждала этот метод.
+
+```csharp
+private async void Button_Click(object sender, RoutedEventArgs e)
+{
+    zagruzkaGrid.Visibility = Visibility.Visible;
+
+    try
+    {
+        isWorking = new CancellationTokenSource();
+        task = Tochki(isWorking.Token);
+        await task;
+    }
+    catch (OperationCanceledException)
+    {
+        zagruzkaText.Text = "Отменено";
+    }
+
+    zagruzkaGrid.Visibility = Visibility.Collapsed;
+}
+```
+
+![Окно MainWindow: кнопка с текстом Canceled, справа слово «Отменено»](../../assets/wpf/cancellation/14_otmeneno_text.png)
+
+Эти три статуса позволят мне более подробно узнать в каком состоянии сейчас находится задача. Такого функционала `bool` нам дать не может, только если мы начнем очень костылять и создавать эти состояния самостоятельно.
+
+Более того, возвращаясь к потокам, при помощи `CancellationToken` мы можем отменять и их. Делается это при помощи той же передачи токена внутрь потока.
+
+## Зачем нужен CancellationToken
+
+Итак, зачем нам нужен `CancellationToken`?
+
+- Мы можем элегантно отменять задачи и говорить коду, какое действие должно произойти при отмене задачи.
+- С его помощью мы можем довести задачу до третьего состояния — отменено, и также обрабатывать его.
+- При помощи него можно отменять потоки.
+
+Также, чтобы не засорять наш компьютер, после работы с `CancellationTokenSource` и `Task`, не забудьте вызвать метод `Dispose`, который освободит все ресурсы компа, которые были затрачены на этот токен :)
+
+![Код после zagruzkaGrid.Visibility = Visibility.Collapsed; — isWorking.Dispose(); task.Dispose(); — оранжевая подпись «так чище!»](../../assets/wpf/cancellation/15_dispose_annotated.png)
+
+## Полный код примера
+
+`MainWindow.xaml.cs` — отмена через `CancellationTokenSource`, отслеживание статуса, обработка `OperationCanceledException`:
+
+```csharp
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        private CancellationTokenSource isWorking;
+        private Task task;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            zagruzkaGrid.Visibility = Visibility.Visible;
+
+            try
+            {
+                isWorking = new CancellationTokenSource();
+                task = Tochki(isWorking.Token);
+                await task;
+            }
+            catch (OperationCanceledException)
+            {
+                zagruzkaText.Text = "Отменено";
+            }
+
+            zagruzkaGrid.Visibility = Visibility.Collapsed;
+
+            isWorking.Dispose();
+            task.Dispose();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            isWorking.Cancel();
+        }
+
+        private void statusBtn_Click(object sender, RoutedEventArgs e)
+        {
+            statusBtn.Content = task.Status;
+        }
+
+        private async Task Tochki(CancellationToken token)
+        {
+            zagruzkaText.Text = "";
+
+            while (true)
+            {
+                if (token.IsCancellationRequested)
+                    token.ThrowIfCancellationRequested();
+
+                zagruzkaText.Text += ".";
+                await Task.Delay(50);
+            }
+        }
+    }
+}
+```

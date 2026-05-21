@@ -3,7 +3,25 @@
     "allow": [
       "PowerShell(& \"D:\\\\Programm Files\\\\Git\\\\cmd\\\\git.exe\" show \"2ed2d84^:csharp/templates/1_Variables.html\")",
       "PowerShell(& \"D:\\\\Programm Files\\\\Git\\\\cmd\\\\git.exe\" show \"2ed2d84^:csharp/templates/4_var.html\")",
-      "PowerShell(& \"D:\\\\Programm Files\\\\Git\\\\cmd\\\\git.exe\" show \"2ed2d84^:csharp/templates/3_Datetime.html\")"
+      "PowerShell(& \"D:\\\\Programm Files\\\\Git\\\\cmd\\\\git.exe\" show \"2ed2d84^:csharp/templates/3_Datetime.html\")",
+      "Bash(mkdir -p /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/xaml-basics)",
+      "Bash(cp image1.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/xaml-basics/1_create_project.png)",
+      "Bash(cp image2.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/xaml-basics/2_solution_explorer.png)",
+      "Bash(cp image4.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/xaml-basics/3_window_view.png)",
+      "Bash(cp image5.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/xaml-basics/4_toolbox.png)",
+      "Bash(python3)",
+      "Bash(mkdir -p /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/events-msgbox)",
+      "Bash(cp image1.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/events-msgbox/1_events_lightning.png)",
+      "Bash(cp image2.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/events-msgbox/2_events_list.png)",
+      "Bash(cp image3.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/events-msgbox/3_click_assigned.png)",
+      "Bash(cp image4.png /Users/safika/Documents/Progs/csharpovna_site/src/assets/wpf/events-msgbox/4_xaml_cs_structure.png)",
+      "Bash(ls /tmp/wpf_docx_extract/ 2>/dev/null || echo \"no cache\")",
+      "Read(//tmp/**)",
+      "Bash(cp '/tmp/wpf_docx_extract/17 пара/word/media/image1.png' src/assets/wpf/animations/01_button_xaml.png)",
+      "Bash(cp '/tmp/wpf_docx_extract/17 пара/word/media/image3.png' src/assets/wpf/animations/02_button_initial.png)",
+      "Bash(cp '/tmp/wpf_docx_extract/17 пара/word/media/image4.png' src/assets/wpf/animations/03_button_growing.png)",
+      "Bash(cp '/tmp/wpf_docx_extract/17 пара/word/media/image5.png' src/assets/wpf/animations/04_button_grown.png)",
+      "Bash(cp '/tmp/wpf_docx_extract/17 пара/word/media/image6.png' src/assets/wpf/animations/05_button_autoreverse.png)"
     ]
   }
 }

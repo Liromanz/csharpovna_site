@@ -96,6 +96,15 @@ h6:hover .heading-anchor {
   scroll-margin-top: calc(var(--spacing-header) + 1rem);
 }
 
+/* Свёрнутый сайдбар на десктопе.
+   Состояние взводится inline-скриптом в <head> по значению из localStorage,
+   чтобы не было мерцания при загрузке. */
+@media (min-width: 768px) {
+  html[data-sidebar-collapsed="true"] #sidebar {
+    display: none;
+  }
+}
+
 /* Sidebar scrollbar — стилизованный под тёмную тему (фикс бага №5) */
 .sidebar-scroll {
   scrollbar-width: thin;

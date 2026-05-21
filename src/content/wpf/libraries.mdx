@@ -1,0 +1,342 @@
+---
+title: 'Создание своих библиотек в WPF: функциональная, стили и пользовательские контролы — pack URI и dll'
+description: 'Свои библиотеки в .NET: функциональная библиотека классов с публичными методами, библиотека стилей с FullDictionary, библиотека пользовательских элементов управления (UserControl) с картинками. Подключение через «Добавить ссылку на проект», pack URI для ResourceDictionary, xmlns на свою сборку, добавление сторонних dll через «Обзор».'
+group: 'Сборка и темы приложения'
+placeholder: false
+keywords:
+  - WPF
+  - 'Библиотека классов'
+  - 'Class Library'
+  - dll
+  - 'Добавить ссылку на проект'
+  - 'pack URI'
+  - 'pack://application'
+  - ResourceDictionary
+  - MergedDictionaries
+  - xmlns
+  - 'clr-namespace'
+  - assembly
+  - UserControl
+---
+
+Некоторые блоки кода если они довольно обширные и могут использоваться и в других проектах, выносятся в отдельные библиотеки. Явный пример — `Newtonsoft.Json` — отдельная библиотека с функционалом для сериализации и десериализации. Мы можем создавать такие же библиотеки в трех направлениях: функциональная библиотека, библиотека стилей и библиотека пользовательских элементов управления.
+
+Для примера, я создам маленькое приложение, над которым буду издеваться.
+
+![Visual Studio с MainWindow: текст «супер приложение», текстовое поле, кнопка «Запустить задачку» и XAML внизу](../../assets/wpf/libraries/01_starting_app_ui.png)
+
+## Функциональная библиотека
+
+Для создания функциональной библиотеки и в принципе любых библиотек нам необходимо добавить новый проект внутрь нашего решения. Решение может хранить несколько проектов и библиотек, чтобы мы сразу видели, что несколько библиотек/приложения относятся к одному и тому же.
+
+ПКМ нажмем по решению и выберем «Добавить», «Создать проект».
+
+![Контекстное меню по ПКМ на решении: рукописные оранжевые цифры 1 (Решение), 2 (Добавить), 3 (Создать проект...)](../../assets/wpf/libraries/02_add_project_menu_annotated.png)
+
+В появившемся окне, как при старте программы, нам нужно найти самую простую библиотеку классов, которая будет поддерживаться на C#.
+
+![Диалог «Добавить новый проект» с поисковым запросом «Библиотека классов» — первая строка с типом «Библиотека классов» обведена оранжевым](../../assets/wpf/libraries/03_classlib_dialog.png)
+
+Назовем как-нибудь наш проект и продолжим.
+
+![Диалог «Настроить новый проект»: «Имя проекта: FunctionalLib», «Расположение: C:\Users\kiss_\source\repos\libExample»](../../assets/wpf/libraries/04_name_functionallib.png)
+
+Теперь внутри нашего решения у нас появился ещё один проект — библиотека с одним классом. По умолчанию, сразу после создания, у нас откроется этот класс.
+
+![Обозреватель решений с двумя проектами: FunctionalLib (рукописная подпись «либа») и libExample (подпись «прога»)](../../assets/wpf/libraries/05_solution_with_lib_annotated.png)
+
+Теперь, прямо внутри этого класса мы можем начать писать какой-то функционал, также как мы это делали и в других приложениях — отдельный класс — отдельный функционал.
+
+Я создам функционал по имитации какого-то долгого действия (примерно, как была генерация точек в [лекции про Task](/wpf/async-await)). Изменю имя класса на `ImmitationWork` и внутрь впишу следующий код.
+
+> Следующий код представлен только для примера и не понадобится вам ни в какой практической, ничего. Вы сюда хоть месседжбокс можете пихнуть.
+
+![Класс public class ImmitationWork с двумя статическими методами: ImmitateLongFileBlock и ImmitateServerResponce — рукописные оранжевые подписи «это метод, который будет блокировать какой-то файл на какое-то n-ое количество секунд» и «это метод который берёт рандомный HTTP статус (202, 500 и прочее) и возвращает его спустя какое-то n-ое количество секунд. по умолчанию — возвращает сразу»](../../assets/wpf/libraries/06_immitationwork_class_annotated.png)
+
+```csharp
+using System.Net;
+
+namespace FunctionalLib
+{
+    public class ImmitationWork
+    {
+        public static void ImmitateLongFileBlock(string file, int milisecond)
+        {
+            using (FileStream fs = new FileStream(file, FileMode.Open))
+            {
+                Thread.Sleep(milisecond);
+            }
+        }
+
+        public static HttpStatusCode ImmitateServerResponce(int milisecond = 0)
+        {
+            Thread.Sleep(milisecond);
+            var statuses = Enum.GetValues(typeof(HttpStatusCode)).Cast<HttpStatusCode>().ToArray();
+            Random rand = new Random();
+            return statuses[rand.Next(0, statuses.Length)];
+        }
+    }
+}
+```
+
+### Подключение библиотеки к проекту
+
+Окей, код мы написали, теперь давайте им воспользуемся внутри приложения. Чтобы это сделать, нам сначала необходимо подключить эту библиотеку. И если мы раньше делали это через `NuGet`, то для самосозданных библиотек мы делаем иначе.
+
+Подключим библиотеку, нажав ПКМ по «Зависимости» и выберем «Добавить ссылку на проект».
+
+![Контекстное меню в обозревателе решений: ПКМ по «Зависимости» приложения libExample, пункт «Добавить ссылку на проект...»](../../assets/wpf/libraries/07_add_project_reference.png)
+
+Поставим галочку на нашей библиотеке и нажмем ОК.
+
+![Диалог «Диспетчер ссылок» с галочкой на FunctionalLib](../../assets/wpf/libraries/08_reference_manager.png)
+
+И теперь мы можем использовать классы, которые были внутри этой библиотеки. Например, обработаю нажатие на кнопку и результат метода `ImmitateServerResponce` выведу в текстовое поле. Само текстовое поле названо `Txt`.
+
+![Код using FunctionalLib (оранжевая подпись «подключаем библиотеку, которую мы создали») и Button_Click с Txt.Text = ImmitationWork.ImmitateServerResponce().ToString(); (оранжевая подпись «используем класс библиотеки и её метод внутри»)](../../assets/wpf/libraries/09_using_library_annotated.png)
+
+Запущу, и по нажатию на кнопку у меня меняется текст.
+
+![Окно MainWindow с текстом «MisdirectedRequest» в поле и кнопкой «Запустить задачку»](../../assets/wpf/libraries/10_misdirectedrequest_ui.png)
+
+## Библиотека стилей
+
+Для создания библиотеки стилей нам нужно сделать тоже самое — ПКМ по решению → Создать проект → Библиотека настраиваемых элементов управления (либо Microsoft, либо .NET Framework). Назову этот проект `CustomLib`.
+
+![Диалог «Добавить новый проект» — найдена «Библиотека настраиваемых элементов управления WPF (Майкрософт)»](../../assets/wpf/libraries/11_custom_control_library_dialog.png)
+
+Проект будет выглядеть следующим образом.
+
+![Обозреватель решений с CustomLib: папка Themes, AssemblyInfo.cs, CustomControl1.cs](../../assets/wpf/libraries/12_customlib_solution.png)
+
+В базовом открываемом файле вы увидите `CustomControl` — это файл, при помощи которого вы можете переписывать стиль для всего приложения через код. Внутри него также есть инструкция как надо подключать этот проект.
+
+Но честно, нам этот файл не интересен, так что я его удалю.
+
+Внутри папки `Themes` разместим стили для кнопок/текстовых полей и других элементов интерфейса, которые мы хотим менять. Старый файл из `Themes` я удалю.
+
+Добавлю внутрь папки `Theme` два заготовленных стиля — кнопку и текстовое поле.
+
+![Обозреватель решений CustomLib: внутри Themes файлы ControlButton.xaml и DefaultTextBox.xaml](../../assets/wpf/libraries/13_two_styles_in_themes.png)
+
+Чтобы я смогла их всецелостно импортировать в свой проект, мне необходимо создать файл, подобный `App.xaml` внутри приложения, где я буду просто хранить все объединенные библиотеки. Назову её `FullDictionary` и помещу его в корень проекта.
+
+![Обозреватель решений: в корне CustomLib создан FullDictionary.xaml (обведён оранжевым)](../../assets/wpf/libraries/14_fulldictionary_root.png)
+
+Содержимое будет следующим — просто сразу скажем что этот словарь состоит из нескольких словарей.
+
+```xml
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Themes/ControlButton.xaml"/>
+        <ResourceDictionary Source="Themes/DefaultTextBox.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+```
+
+Чтобы подключить такую библиотеку, опять же в основном проекте нажмем на зависимости → Добавить существующий проект и галочку по новой библиотеке → ОК.
+
+![Диспетчер ссылок с двумя галочками: CustomLib и FunctionalLib](../../assets/wpf/libraries/15_reference_customlib_added.png)
+
+Внутрь `App.xaml` основного приложения нужно прописать ссылку на файл со всеми словарями. Этот ресурс пропишется как:
+
+```xml
+<ResourceDictionary Source="pack://application:,,,/библиотека;component/папка/названиесловаря.xaml"/>
+```
+
+![App.xaml с ResourceDictionary Source=«pack://application:,,,/CustomLib;component/FullDctionary.xaml» — оранжевое подчёркивание pack URI](../../assets/wpf/libraries/16_app_xaml_pack_uri_annotated.png)
+
+Не забываем собрать проект заново, как только мы подключили новую библиотеку!
+
+![Меню «Сборка» в Visual Studio: пункт «Построить libExample» (Ctrl+B)](../../assets/wpf/libraries/17_build_menu.png)
+
+И теперь мы можем использовать стили из этой библиотеки.
+
+![Visual Studio с MainWindow: TextBox и Button уже со стилями из библиотеки (DynamicResource DefaultTextBox и ControlButton)](../../assets/wpf/libraries/18_styled_ui_after_build.png)
+
+## Библиотека пользовательских элементов управления
+
+Создадим внутри решения ещё одну библиотеку — Библиотека пользовательских элементов WPF. Назову её `ControlsLib`.
+
+![Диалог «Добавить новый проект» — найдена «Библиотека пользовательских элементов управления WPF (Майкрософт)»](../../assets/wpf/libraries/19_custom_usercontrol_dialog.png)
+
+Выглядеть она будет следующим образом. Здесь я смогу располагать все пользовательские элементы интерфейса, которые хочу вынести из проекта.
+
+![Обозреватель решений с ControlsLib: AssemblyInfo.cs и UserControl1.xaml](../../assets/wpf/libraries/20_controlslib_solution.png)
+
+Возьму, например, [карточку из календаря](/wpf/custom-controls) и перенесу её сюда. Она подразумевала картинку, так что добавлю ещё и картинку.
+
+![Обозреватель решений ControlsLib: папка Images с vegetables.png и CalendarCard.xaml](../../assets/wpf/libraries/21_controlslib_with_images.png)
+
+Чтобы картинка работала, поставлю ей в свойствах Ресурс и Копировать всегда. Однако у меня появится проблема — картинка не будет видна в карточке.
+
+Для того, чтобы это исправить, внутрь `Image`, в свойство `Source`, необходимо вставить такой же источник, каким мы делали `ResourceDictionary` для `App.xaml`. Алгоритм следующий:
+
+```
+pack://application:,,,/библиотека;component/папка/названиекартинки.расширение
+```
+
+Я ссылаюсь сама на себя, так что ссылка будет следующая.
+
+![Visual Studio с CalendarCard в дизайнере: ящик с овощами, XAML с Image Source=«pack://application:,,,/ControlsLib;component/Images/vegetables.png» — оранжевое подчёркивание pack URI](../../assets/wpf/libraries/22_calendarcard_xaml_pack.png)
+
+### Подключение и использование
+
+И теперь библиотеку со своими элементами управления мы можем добавить в наш проект. Также нажмем ПКМ по зависимостям → Добавить проект и галочку по проекту → ОК.
+
+![Диспетчер ссылок с тремя галочками: ControlsLib, CustomLib, FunctionalLib](../../assets/wpf/libraries/23_three_libs_reference.png)
+
+Не забудем собрать проект при помощи `Ctrl + B`.
+
+Чтобы вызывать эти элементы интерфейса из другой библиотеки, нам надо добавить новый `xmlns` внутрь `MainWindow`. Добавим и назовем например `cards`. Внутрь впишем название библиотеки. Как только мы начнем его вписывать, он автоматом нам предложит подключить эту ссылку.
+
+![Окно MainWindow в XAML: набирается xmlns:cards=«Contro», IntelliSense предлагает ControlWpfLib (ControlsLib)](../../assets/wpf/libraries/24_xmlns_autocomplete.png)
+
+Полностью выглядеть она будет так.
+
+```xml
+<Window x:Class="libExample.MainWindow"
+        xmlns:cards="clr-namespace:ControlWpfLib;assembly=ControlsLib">
+```
+
+Чтобы обратиться к этим элементам, воспользуемся библиотекой `cards` при помощи `cards:названиеэлемента`.
+
+![Конструктор MainWindow с карточкой-овощами вверху, надписью «супер приложение» и кнопкой «Запустить задачку», XAML внизу с тегом cards:CalendarCard — оранжевое подчёркивание префикса cards](../../assets/wpf/libraries/25_calendarcard_usage_annotated.png)
+
+И в целом, с тремя подключенными библиотеками, наша программа будет выглядеть вот так.
+
+![Запущенное приложение: вверху карточка с овощами и числом 30, в центре «UseProxy» в текстовом поле, ниже кнопка «Запустить задачку»](../../assets/wpf/libraries/26_all_three_libs_ui.png)
+
+## Подключение сторонних библиотек через .dll
+
+Также, если мы вдруг нашли dll файл, мы можем подключить его как библиотеку. Каждая собранная нами библиотека также имеет формат dll файла, а не exe или прочего. Например так выглядит папка debug у библиотеки с классом.
+
+![Проводник: ...\repos\libExample\FunctionalLib\bin\Debug\net6.0 с FunctionalLib.deps.json, FunctionalLib.dll, FunctionalLib.pdb](../../assets/wpf/libraries/27_dll_classlib_debug.png)
+
+А так выглядит папка debug у приложения.
+
+![Проводник: ...\repos\libExample\libExample\bin\Debug\net6.0-windows с разными dll (ControlsLib.dll, CustomLib.dll, FunctionalLib.dll), libExample.exe — оранжевые стрелки с подписью «внутри которого вы уже можете видеть разные подключённые библиотеки»](../../assets/wpf/libraries/28_app_debug_dlls_annotated.png)
+
+Если вдруг где-то на просторах интернета или просто на рабочем столе вы нашли dll файлик (что дико маловероятно), то вы можете добавить его внутрь проекта следующим образом.
+
+Выгружу библиотеку `FunctionalLib` чтобы решение не видело его (ПКМ → Выгрузить проект).
+
+![Обозреватель решений: проект FunctionalLib помечен как «(выгружено)»](../../assets/wpf/libraries/29_unloaded_functionallib.png)
+
+В проводнике у меня всё ещё остался этот проект и его dll файл (картинки выше). Чтобы подключить отдельный файл, мне нужно ПКМ нажать по зависимостям, тыкнуть на любую из первых трех пунктов и в появившемся окне перейти в «Обзор».
+
+![Диспетчер ссылок с открытой вкладкой «Обзор» — пустая таблица и кнопка «Обзор...» внизу](../../assets/wpf/libraries/30_reference_browse_dialog.png)
+
+Нажмем на кнопку «Обзор» внизу и найду папку, где у меня хранилась dll.
+
+![Окно «Выберите файлы, на которые нужно установить ссылки...» с выбранным FunctionalLib.dll в папке bin\Debug\net6.0](../../assets/wpf/libraries/31_file_picker_dll.png)
+
+Поставлю галочку напротив него, нажму ОК и я опять же могу её использовать.
+
+![Диспетчер ссылок с двумя строками: sdfsdfsdf.dll (без галочки) и FunctionalLib.dll (с галочкой)](../../assets/wpf/libraries/32_dll_added_via_browse.png)
+
+## Полный код примера
+
+`FunctionalLib/ImmitationWork.cs` — функциональная библиотека:
+
+```csharp
+using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading;
+
+namespace FunctionalLib
+{
+    public class ImmitationWork
+    {
+        public static void ImmitateLongFileBlock(string file, int milisecond)
+        {
+            using (FileStream fs = new FileStream(file, FileMode.Open))
+            {
+                Thread.Sleep(milisecond);
+            }
+        }
+
+        public static HttpStatusCode ImmitateServerResponce(int milisecond = 0)
+        {
+            Thread.Sleep(milisecond);
+            var statuses = Enum.GetValues(typeof(HttpStatusCode)).Cast<HttpStatusCode>().ToArray();
+            Random rand = new Random();
+            return statuses[rand.Next(0, statuses.Length)];
+        }
+    }
+}
+```
+
+`CustomLib/FullDictionary.xaml` — объединённый словарь стилей:
+
+```xml
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Themes/ControlButton.xaml"/>
+        <ResourceDictionary Source="Themes/DefaultTextBox.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
+```
+
+`libExample/App.xaml` — pack URI до словаря из CustomLib:
+
+```xml
+<Application x:Class="libExample.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CustomLib;component/FullDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+```
+
+`libExample/MainWindow.xaml` — xmlns на свою сборку и использование `<cards:CalendarCard/>`:
+
+```xml
+<Window x:Class="libExample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cards="clr-namespace:ControlWpfLib;assembly=ControlsLib"
+        Title="MainWindow" Height="345" Width="450">
+    <Grid>
+        <cards:CalendarCard HorizontalAlignment="Center" VerticalAlignment="Top" Height="50" Width="50"/>
+        <TextBox x:Name="Txt" Style="{DynamicResource DefaultTextBox}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Button Style="{DynamicResource ControlButton}"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10"
+                Content="Запустить задачку" Click="Button_Click"/>
+    </Grid>
+</Window>
+```
+
+`libExample/MainWindow.xaml.cs` — использование статического метода из библиотеки:
+
+```csharp
+using System.Windows;
+using FunctionalLib;
+
+namespace libExample
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Txt.Text = ImmitationWork.ImmitateServerResponce().ToString();
+        }
+    }
+}
+```

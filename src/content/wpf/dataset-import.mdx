@@ -1,0 +1,233 @@
+---
+title: 'Импорт данных из JSON в БД через DataSet: модель без ID, generic-десериализатор и foreach с InsertQuery'
+description: 'Импорт данных из JSON-файла в таблицу БД через DataSet и TableAdapter. Создание модели данных без ID и с get/set, generic-десериализатор через JsonConvert.DeserializeObject<T>() + OpenFileDialog, цикл foreach по полученному листу с вызовом InsertQuery(item.name, item.hexademical) и обновление DataGrid через ItemsSource = null + GetData(). Утилита JsonCreator для подготовки JSON под произвольную модель.'
+group: 'Базы данных: DataSet'
+placeholder: false
+keywords:
+  - WPF
+  - DataSet
+  - TableAdapter
+  - InsertQuery
+  - 'импорт JSON'
+  - 'JsonConvert.DeserializeObject'
+  - generic
+  - OpenFileDialog
+  - 'модель данных'
+---
+
+В практической также должен быть реализован импорт данных из JSON. Её логика достаточно проста, но давайте подробнее разберёмся.
+
+## Подготовка БД и интерфейса
+
+Мне нужна таблица, куда я буду выгружать данные. Создам таблицу в БД с цветами.
+
+![Таблица colour в SSMS: колонки id, name, hexademical — 6 строк с цветами и hex-кодами](../../assets/wpf/dataset-import/01_colour_table.png)
+
+В WPF приложении подключу эту БД с таблицей и создам интерфейс, куда я выгружу таблицу и кнопку для импорта. Таблицу я назову `ColourDgr`.
+
+![Visual Studio с MainWindow: DataGrid и кнопка «Импортировать данные», XAML с DataGrid x:Name=ColourDgr и Button](../../assets/wpf/dataset-import/02_app_xaml.png)
+
+Также у меня есть подключенная БД с таблицей цветов. Внутри неё я создам запрос на добавление данных, чтобы я смогла добавить внутрь импортированные данные из файла.
+
+![EDM-схема: таблица colour и colourTableAdapter с двумя методами — Fill,GetData() и InsertQuery (@name, @hexademical)](../../assets/wpf/dataset-import/03_dataset_colour_insertquery.png)
+
+Выгружу данные из таблицы внутрь своего датагрида при помощи датасета. Таблица у меня называется colour, поэтому я подключу `colourTableAdapter`.
+
+![Код MainWindow: using тестыWPFFramework.exampleDbDataSetTableAdapters; colourTableAdapter adapter = new colourTableAdapter(); ColourDgr.ItemsSource = adapter.GetData(); — оранжевые подчёркивания](../../assets/wpf/dataset-import/04_app_init_annotated.png)
+
+Сама программа будет работать следующим образом.
+
+![Окно MainWindow с DataGrid: 6 строк цветов (Зелёный, Синий, Жёлтый, Красный, Серый, Чёрный) с их hex-значениями, кнопка «Импортировать данные» внизу](../../assets/wpf/dataset-import/05_initial_ui.png)
+
+## Модель данных под JSON
+
+Для того, чтобы импортнуть данные из [JSON](/csharp/json), мне нужно создать [модель данных](/csharp/classasmodel), который JSON будет принимать. Модель данных должна быть идентичной с таблицей, но без ID. То есть в своём случае я создам модель данных где у меня будет `name` и `hexademical`. Все свойства должны быть с [гетами и сетами](/wpf/properties).
+
+![Код internal class colourModel с двумя строковыми свойствами name и hexademical с get и set](../../assets/wpf/dataset-import/06_colour_model.png)
+
+```csharp
+namespace тестыWPFFramework
+{
+    internal class colourModel
+    {
+        public string name { get; set; }
+        public string hexademical { get; set; }
+    }
+}
+```
+
+## Generic-десериализатор
+
+Для импорта я возьму свой класс с generic-методами для сериализации и десериализации. Для импорта мне нужна только десериализация, сериализацию удалю.
+
+![Код internal class LabaConverter с generic-методом DeserializeObject — внутри OpenFileDialog с ShowDialog(), File.ReadAllText, JsonConvert.DeserializeObject и else return default — комментарии «выбираю файл для десериализации», «если все ок, читаю данные из файла и десериализую», «если не ок, возвращаю значение типа данных по умолчанию»](../../assets/wpf/dataset-import/07_labaconverter_class.png)
+
+```csharp
+using System.IO;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+
+internal class LabaConverter
+{
+    public static T DeserializeObject<T>()
+    {
+        OpenFileDialog dialog = new OpenFileDialog();   // выбираю файл для десериализации
+        if (dialog.ShowDialog() == true)
+        {
+            string json = File.ReadAllText(dialog.FileName);
+            T obj = JsonConvert.DeserializeObject<T>(json); // если всё ок, читаю данные из файла и десериализую
+            return obj;
+        }
+        else
+        {
+            return default(T);                          // если не ок, возвращаю значение типа данных по умолчанию
+        }
+    }
+}
+```
+
+## Подготовка JSON через JsonCreator
+
+Теперь мне нужен файл для десериализации. Здесь вам необходимо использовать маленькую программу, которая у вас хранится в папке `JsonCreator`.
+
+Логика работы с программой:
+
+Открываете программу в Visual Studio. Здесь вам не нужно менять никакой код, нужно только загрузить ваш тип данных который вы создали. В моём случае — `colourModel`.
+
+`colourModel` я загружаю в папку `Models`. Остальные файлы я не трогаю.
+
+![Обозреватель решений JsonCreator с папкой Model, внутри colourModel.cs и IToFindModel.cs, оранжевая стрелка с подписью «вот сюда»](../../assets/wpf/dataset-import/08_jsoncreator_model_folder_annotated.png)
+
+Чтобы программа нашла этот файл, она должна наследовать `IToFindModel`.
+
+![Код internal class colourModel : IToFindModel с двумя string-свойствами — оранжевое подчёркивание IToFindModel](../../assets/wpf/dataset-import/09_colour_model_itofindmodel_annotated.png)
+
+Запускаем программу, вводим количество данных, которые я хочу импортировать, и заполняю их значениями. В конце введу название JSON файла.
+
+![Консоль отладки Visual Studio: «Введите сколько элементов вы хотите создать», 3, далее три раза вводятся name и hexademical, потом «Введите название JSON файла» и Forimport](../../assets/wpf/dataset-import/10_jsoncreator_console.png)
+
+По итогу я получу следующий файл, который я смогу импортировать.
+
+![JSON-файл с массивом из трёх объектов: name «Серобурмалиновый» hex FFF333, name «Фиолетовый» hex 111333, name «Коричневый» hex 098765](../../assets/wpf/dataset-import/11_generated_json.png)
+
+## Работа с основной программой — импорт данных
+
+Чтобы сделать импорт, для начала я обработаю нажатие на кнопку импорта. Внутри я вызову свой класс с десериализацией данных из файла. Я хочу получить лист с цветами, поэтому, во-первых, тип данных будет `List<colourModel>`, а во-вторых, все данные я также сохраню в переменную с типом данных `List<colourModel>`.
+
+![Код Button_Click с переменной forImport типа List colourModel, заполненной через LabaConverter.DeserializeObject](../../assets/wpf/dataset-import/12_button_click_deserialize.png)
+
+```csharp
+private void Button_Click(object sender, RoutedEventArgs e)
+{
+    List<colourModel> forImport = LabaConverter.DeserializeObject<List<colourModel>>();
+}
+```
+
+После того, как мы всё десериализовали, нам нужно пробежаться по каждому элементу и добавить данные внутрь БД. Создадим [цикл](/csharp/cycles) чтобы пробежаться по всему листу.
+
+![Код: получение forImport через LabaConverter.DeserializeObject и пустой foreach (var item in forImport)](../../assets/wpf/dataset-import/13_foreach_loop.png)
+
+А внутри я вызову свой адаптер (название моей переменной для `colourTableAdapter`) и через него добавлю данные в БД. Данные я возьму из `item` — переменной внутри цикла.
+
+![Код MainWindow с adapter инициализацией, GetData() в конструкторе и в Button_Click — foreach с adapter.InsertQuery(item.name, item.hexademical); — оранжевая стрелка от adapter к InsertQuery](../../assets/wpf/dataset-import/14_insertquery_call_annotated.png)
+
+```csharp
+foreach (var item in forImport)
+{
+    adapter.InsertQuery(item.name, item.hexademical);
+}
+```
+
+В самом конце обновлю содержимое таблицы.
+
+![Код после foreach: ColourDgr.ItemsSource = null; ColourDgr.ItemsSource = adapter.GetData();](../../assets/wpf/dataset-import/15_refresh_itemssource.png)
+
+```csharp
+foreach (var item in forImport)
+{
+    adapter.InsertQuery(item.name, item.hexademical);
+}
+
+ColourDgr.ItemsSource = null;
+ColourDgr.ItemsSource = adapter.GetData();
+```
+
+Как итог — я могу выбрать файл и добавить из него данные в БД.
+
+![Окно MainWindow с DataGrid: первые 6 строк (Зелёный, Синий, Жёлтый, Красный, Серый, Чёрный) плюс новые 3 — Серобурмалиновый, Фиолетовый, Коричневый — снизу](../../assets/wpf/dataset-import/16_imported_ui.png)
+
+## Полный код примера
+
+`colourModel.cs` — модель под JSON:
+
+```csharp
+namespace тестыWPFFramework
+{
+    internal class colourModel
+    {
+        public string name { get; set; }
+        public string hexademical { get; set; }
+    }
+}
+```
+
+`LabaConverter.cs` — generic-десериализатор с OpenFileDialog:
+
+```csharp
+using System.IO;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+
+namespace тестыWPFFramework
+{
+    internal class LabaConverter
+    {
+        public static T DeserializeObject<T>()
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                string json = File.ReadAllText(dialog.FileName);
+                return JsonConvert.DeserializeObject<T>(json);
+            }
+            return default(T);
+        }
+    }
+}
+```
+
+`MainWindow.xaml.cs` — отображение таблицы + импорт по кнопке:
+
+```csharp
+using System.Collections.Generic;
+using System.Windows;
+using тестыWPFFramework.exampleDbDataSetTableAdapters;
+
+namespace тестыWPFFramework
+{
+    public partial class MainWindow : Window
+    {
+        colourTableAdapter adapter = new colourTableAdapter();
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            ColourDgr.ItemsSource = adapter.GetData();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            List<colourModel> forImport = LabaConverter.DeserializeObject<List<colourModel>>();
+            if (forImport == null) return;
+
+            foreach (var item in forImport)
+            {
+                adapter.InsertQuery(item.name, item.hexademical);
+            }
+
+            ColourDgr.ItemsSource = null;
+            ColourDgr.ItemsSource = adapter.GetData();
+        }
+    }
+}
+```

@@ -1,0 +1,228 @@
+---
+title: 'Подключение базы данных через Entity Framework в WPF: ADO.NET EDM, DbContext, выгрузка в DataGrid и ComboBox'
+description: 'Подключение SQL Server в проект WPF (.NET Framework) и работа с БД через Entity Framework. Создание подключения через «Средства → Подключиться к базе данных», TrustServerCertificate, генерация модели ADO.NET EDM из существующей БД, использование контекста <БД>Entities для выгрузки таблиц в DataGrid через ToList(), скрытие фантомных navigation-столбцов через private get, ComboBox с DisplayMemberPath и SelectedItem для получения выбранной записи как модели.'
+group: 'Базы данных: Entity Framework'
+placeholder: false
+keywords:
+  - WPF
+  - 'Entity Framework'
+  - 'ADO.NET EDM'
+  - DbContext
+  - 'EDM Wizard'
+  - SqlServer
+  - 'TrustServerCertificate'
+  - DataGrid
+  - ItemsSource
+  - DisplayMemberPath
+  - SelectedItem
+  - ToList
+  - 'Свойства навигации'
+---
+
+Источником данных для приложения может быть всё что угодно — код, файл, или база данных. Если с первыми двумя вещами мы умеем работать, давайте научимся работать с базой данных.
+
+## Создание проекта
+
+Прежде чем брать данные из БД, нужно подготовиться — создать проект «Приложение WPF (.NET Framework)» и подключить базу данных SQL в проект. «Приложение WPF (Майкрософт)» нам не подойдёт, так как DataSet там не работает.
+
+![Диалог создания проекта: две карточки — «Приложение WPF (Майкрософт)» с красным крестом и «Приложение WPF (.NET Framework)» с зелёной галочкой](../../assets/wpf/ef-connection/01_choose_net_framework_annotated.png)
+
+## Подключение к SQL Server
+
+Для того, чтобы подключиться к БД, нужно в Visual Studio выбрать «Средства» → «Подключиться к базе данных». Перед нами появится окно «Сменить источник данных», если мы ещё ни разу не подключали БД до этого. Здесь нам нужно выбрать «Microsoft SQL Server». Поставщиком данных будет .NET Framework.
+
+Если Visual Studio попросит что-то докачать, смело докачивайте — это модули по управлению БД.
+
+![Диалог «Сменить источник данных» с выбранным Microsoft SQL Server и Поставщиком данных .NET Framework](../../assets/wpf/ef-connection/02_change_datasource_dialog.png)
+
+Нажимаем ОК и перед нами появляется окно добавления подключения. Здесь мы указываем:
+
+- **Имя сервера.** Его можно взять из MSSQL, в окне соединения с сервером (самое стартовое).
+- (Опционально) **Выбрать проверку подлинности.** При проверке через Windows не придётся вводить пароль, при проверке SQL — придётся. Если у вас удалённый сервер, лучше выбрать проверку SQL. Логин по умолчанию `sa`.
+
+![Окно «Соединение с сервером»: Тип сервера «Ядро СУБД», поле «Имя сервера» с localhost\\SQLEXPRESS обведённым оранжевым](../../assets/wpf/ef-connection/03_sql_server_connection_annotated.png)
+
+- **Выбрать базу данных.** Если первые два пункта заполнены верно, выпадающий список появится моментально. Если он не появляется — проверьте правильность первых двух пунктов. Внутри списка выберите к чему вы хотите подключиться.
+
+![Окно «Добавить подключение» с рукописными цифрами 1 (Имя сервера), 2 (Проверка подлинности Windows, «опционально»), 3 (выпадающий список БД с подсвеченной ExampleDB)](../../assets/wpf/ef-connection/04_add_connection_annotated.png)
+
+В некоторых случаях, на всех следующих этапах могут появиться ошибки, если у вас MSSQL имеет сертификат доверенности. Для этого, в дополнительных настройках поставьте `TrustServerCertificate = True`. Лишним никогда не будет.
+
+![Окно «Расширенные свойства» со списком: Integrated Security, IP Address Preference, Password, Persist Security Info, Trust Server Certificate выделено и установлено True — красная стрелка к кнопке «Дополнительно...»](../../assets/wpf/ef-connection/05_trust_server_certificate_annotated.png)
+
+Нажимаем ОК и наше подключение будет сохранено в «Обозревателе серверов».
+
+![Обозреватель серверов с разделом «Подключения данных» и узлом desktop-4q0er9l\\sqlexpress.ExampleDB.dbo](../../assets/wpf/ef-connection/06_server_explorer.png)
+
+Для этого примера у меня есть база данных `ExampleDB`. Внутри неё 2 таблицы — `colour` и `human` с любимым цветом.
+
+## Создание модели ADO.NET EDM
+
+Теперь нам нужно создать объект, при помощи которого мы в коде будем работать с БД — Модель ADO.NET. Создаётся она как обычный файл внутри проекта, через ПКМ по проекту → Добавить → Создать элемент.
+
+![Обозреватель решений с открытым контекстным меню «Добавить» → «Создать элемент…»](../../assets/wpf/ef-connection/07_add_new_item_menu.png)
+
+Модель ADO.NET можно найти как вручную, так и по-быстрому, на вкладке «Данные». Назвать можете как хотите, я назову также, как и базу данных — `ExampleDB`.
+
+![Диалог «Добавление нового элемента»: рукописные красные цифры 1 (раздел Данные), 2 (Модель ADO.NET EDM), 3 (имя ExampleDB), 4 (кнопка Добавить)](../../assets/wpf/ef-connection/08_add_ado_net_model_annotated.png)
+
+При создании этой модели Visual Studio спросит у вас, что именно вам нужно создать и по каким таблицам. В первом окне выбираем конструктор.
+
+![Мастер моделей EDM: «Выбор содержимого модели» с вариантом «Конструктор EF из базы данных» (выбрано)](../../assets/wpf/ef-connection/09_edm_wizard_constructor.png)
+
+Потом он спросит — а какую БД использовать для создания моделей. Тут мы выбираем то самое подключение, которое создавали ранее. Если не создавали, нажмите на «Создать соединение» и вернитесь в начало лекции, там будет точно такое же окошко.
+
+В строке подключения хранятся конфиденциальные данные, типа логина и пароля от сервера, даже если подключение шло через Windows. Правильным тоном будет всегда прятать эти данные, где бы то ни было, и сепаратировать их друг от дружки. Логин пароль отдельно, строка подключения отдельно, поэтому в радиобаттонах выберем первый пункт.
+
+![Мастер EDM «Выбор подключения к данным» с цифрами 1 (dropdown подключения), 2 (радио «Нет, исключите конфиденциальные данные из строки подключения») и 3 (Далее)](../../assets/wpf/ef-connection/10_edm_wizard_connection_annotated.png)
+
+Версия должна подтянуться у вас автоматически, в зависимости от того, какая версия проекта у вас стоит, так что тут ничего не меняйте.
+
+![Мастер EDM «Выберите версию»: «Entity Framework 6.x» (выбрано)](../../assets/wpf/ef-connection/11_edm_wizard_version.png)
+
+Далее он спросит вас, что нужно закинуть в WPF. Тут выбираете всё что нужно. Ни процедур, ни представлений у меня нет, так что я выберу только таблички.
+
+![Мастер EDM «Выберите параметры и объекты»: галочка на «Таблицы» с цифрой 1, кнопка «Готово» с цифрой 2](../../assets/wpf/ef-connection/12_edm_wizard_tables_annotated.png)
+
+Нажимая готово, он начнёт создавать модель. Создавать он её будет а) долго, б) с постоянно всплывающими окнами, мол, «этот файл может взорвать ваш кампипуктер, взрывать?». С всплывающими окнами просто нажмите галочку «Больше не показывать» и «Да».
+
+Никуда не нажимайте, пока не увидите более-менее похожую картинку с табличками, иначе ~~комп реально взорвётся~~ Visual Studio залагает и вылетит, и действия придётся делать заново.
+
+![Диаграмма ExampleDB.edmx с двумя таблицами colour (id, name + navigation human) и human (id, name, colourId + navigation colour), связь 1 ко многим](../../assets/wpf/ef-connection/13_edmx_diagram.png)
+
+Если вам в будущем нужно будет обновить БД — ПКМ по свободной области → «Обновить модель из базы данных», и повторить действия выше. В мастере будет понятно куда тыкать, в зависимости от вашего выбора — добавить, изменить или удалить.
+
+![Диаграмма EDMX с контекстным меню — выделен пункт «Обновить модель из базы данных…»](../../assets/wpf/ef-connection/14_update_model_menu.png)
+
+## Выгрузка данных в DataGrid
+
+Для того, чтобы подтянуть данные из таблицы, давайте возьмём в пример табличку `colour`. Для её отображения, я тоже сделаю [DataGrid](/wpf/datagrid) в `MainWindow`, назвав её `ColourDgr`.
+
+```xml
+<Grid>
+    <DataGrid x:Name="ColourDgr"/>
+</Grid>
+```
+
+Чтобы подтянуть все данные из таблицы, мне нужна одна переменная, которая условно будет являться базой данных. Из неё я могу подтянуть любую табличку, представить её как коллекцию, и уже оттуда брать/добавлять/изменять/удалять данные. Делается это вот так:
+
+- Создаётся переменная типа данных `<название бд>Entities` и как-нибудь называется. Я назвала `context`.
+- Через эту переменную `context` берётся табличка (например, в БД-шке есть табличка `hihiHAHA`, брать вы её будете как `context.hihiHAHA`. Регистр важен).
+- Табличка преобразовывается в лист и пихается в датагрид для отображения.
+
+![Код MainWindow с приватным контекстом ExampleDBEntities и ColourDgr.ItemsSource из context.colour.ToList — оранжевые подписи «создаем одну единую переменную для взаимодействия со ВСЕЙ БД», «из бд-шки», «берем табличку», «и все данные из нее делаем листом»](../../assets/wpf/ef-connection/15_context_init_annotated.png)
+
+```csharp
+public partial class MainWindow : Window
+{
+    // создаём одну единую переменную для взаимодействия со ВСЕЙ БД
+    private ExampleDBEntities context = new ExampleDBEntities();
+
+    public MainWindow()
+    {
+        InitializeComponent();
+        ColourDgr.ItemsSource = context.colour.ToList();
+    }
+}
+```
+
+Уже на этом этапе можно запускать и увидеть результат. Единственное, можно увидеть фантомный столбец.
+
+![Окно MainWindow с DataGrid: колонки id, name, human — последняя колонка human пустая (navigation-свойство)](../../assets/wpf/ef-connection/16_phantom_column.png)
+
+Он мне не нравится, я хочу его скрыть. Скрываем столбцы из DataGrid по той же схеме, как скрывали бы любые другие столбцы — находим файл с моделью и настраиваем у него `get;set`. В этом случае — ставим `private` у `get` (так нужно, чтобы и переменная не критовала, так как `virtual` может быть только с `get;set`, но и интерфейс её не отображал, потому что доступ только в этом файле).
+
+> **ВАЖНО** — ЕСЛИ ВЫ ПОМЕНЯЕТЕ ТАБЛИЦЫ В ДИАГРАММЕ, ВАШИ ИЗМЕНЕНИЯ В МОДЕЛЯХ СЛЕТЯТ И ИХ НУЖНО СТАВИТЬ ЗАНОВО.
+
+![Файл colour.cs с моделью — у public virtual ICollection human стоит private get, set — рукописная подпись «ставим перед get слово private»](../../assets/wpf/ef-connection/17_model_get_private_annotated.png)
+
+И фантомный столбец перестанет отображаться.
+
+![Окно MainWindow с DataGrid: только колонки id и name](../../assets/wpf/ef-connection/18_no_phantom_column.png)
+
+## Выгрузка данных в списки
+
+Подобным образом данные можно выводить не только в таблицы, но и в [списки](/wpf/combobox-listbox) — обычный (`ListBox`) и выпадающий (`ComboBox`). Возьмём, например, выпадающий список. Назову его `ColourCbx`.
+
+Чтобы вывести туда данные, необходимо также, через источник элементов (`ItemsSource`), присвоить им значения из таблицы. Мы укажем, что источник элементов равен листу данных из нашей таблички colour, как было с датагридом.
+
+Однако теперь нам нужно ещё указать, какой именно столбец должен отобразиться. Сделаем мы это через `ColourCbx.DisplayMemberPath = "name"`.
+
+![Код MainWindow: context инициализация, ColourCbx.ItemsSource = context.colour.ToList(); ColourCbx.DisplayMemberPath = «name»; — красная стрелка с подписью «название столбца в таблице» и подпись «имясписка.отображаемоеимя»](../../assets/wpf/ef-connection/19_combobox_display_member_annotated.png)
+
+![Раскрытый ComboBox с пунктами: Зелёный, Синий, Жёлтый, Красный](../../assets/wpf/ef-connection/20_combobox_dropdown.png)
+
+## Выбор данных из таблицы
+
+Чтобы взять данные из таблицы или списка, я также буду использовать `SelectedItem`. `SelectedIndex` здесь работать не будет (либо дико криво и критовать, так как по факту, мы работаем не с листом, а с объектами базы данных). Опять же воспользуемся [четырьмя пунктами](/wpf/datagrid) для взаимодействия с элементами.
+
+Верну `DataGrid` вместо `ComboBox`.
+
+1. Дадим имя списку — уже есть, `ColourDgr`.
+2. Найдём нужное свойство — `SelectedItem`.
+3. Обработаем событие — мне нужно изменение выбора, значит событие `SelectionChanged`.
+4. Объединим 1 и 2 пункт — `ColourDgr.SelectedItem`.
+
+Каждый объект таблицы — это модель. Подобно тому, как было в практических работах — мы выгружали в список/табличку лист с моделями, один объект — одна модель. Значит и взять нужно выбранный элемент как модель. И сохранить в переменную, чтобы не потерять.
+
+```csharp
+private void ColourDgr_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    var selected = ColourDgr.SelectedItem as colour;
+}
+```
+
+Уже из этой переменной я могу подтянуть значение из любого поля (столбца), будь то `id`, будь то `name`.
+
+![Код ColourDgr_SelectionChanged с var selected as colour и MessageBox.Show selected.id.ToString() — комментарий 2, MessageBox.Show selected.name — комментарий «синий», справа DataGrid с выбранной строкой «Синий»](../../assets/wpf/ef-connection/21_selection_id_name.png)
+
+![Тот же код, но выбрана строка «Красный»: id 4, name «Красный»](../../assets/wpf/ef-connection/22_selection_other_row.png)
+
+С данными из ячейки я могу работать как захочу — вывести в [MessageBox](/wpf/events-msgbox), записать в текстовое поле, построить с этой переменной [условие](/csharp/if) и прочее.
+
+## Полный код примера
+
+`MainWindow.xaml` — DataGrid (или ComboBox) под содержимое таблицы:
+
+```xml
+<Window x:Class="vipief.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <DataGrid x:Name="ColourDgr" SelectionChanged="ColourDgr_SelectionChanged"/>
+    </Grid>
+</Window>
+```
+
+`MainWindow.xaml.cs` — единый контекст БД, выгрузка в DataGrid и обработка выбора:
+
+```csharp
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace vipief
+{
+    public partial class MainWindow : Window
+    {
+        private ExampleDBEntities context = new ExampleDBEntities();
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            ColourDgr.ItemsSource = context.colour.ToList();
+        }
+
+        private void ColourDgr_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = ColourDgr.SelectedItem as colour;
+            if (selected != null)
+            {
+                MessageBox.Show(selected.id.ToString());
+                MessageBox.Show(selected.name);
+            }
+        }
+    }
+}
+```

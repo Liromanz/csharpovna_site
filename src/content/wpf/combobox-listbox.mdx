@@ -1,0 +1,296 @@
+---
+title: 'ComboBox и ListBox в WPF: ItemsSource, SelectedIndex, SelectionChanged и DisplayMemberPath'
+description: 'Создание ComboBox и ListBox в WPF через XAML и через ItemsSource в коде, выбор элемента через SelectedIndex и SelectedItem, обработчик SelectionChanged и вывод собственного типа данных через DisplayMemberPath c обязательными {get; set;}.'
+group: 'Основы WPF и XAML'
+placeholder: false
+keywords:
+  - WPF
+  - ComboBox
+  - ListBox
+  - ItemsSource
+  - SelectedIndex
+  - SelectedItem
+  - SelectionChanged
+  - DisplayMemberPath
+  - 'get set'
+---
+
+## ComboBox
+
+А вот ComboBox не входит под общую гребенку с флагами. ComboBox — выпадающий список, элементы которого мы можем настроить как из кода, так и из XAML. Начнем с XAML.
+
+Через свойства, если честно, делать неприятно долго. Давайте начнем с того, что раз у нас что-то должно быть внутри комбобокса, значит и элементы мы будем располагать внутри комбобокса. Нам нужен открывающий и закрывающий тэг. Внутри него мы будем располагать элементы комбобокса — `ComboBoxItem`. Текст для каждого элемента мы можем настроить с помощью свойства `Content`.
+
+![XAML с ComboBox и четырьмя ComboBoxItem с подписью «закрывающий тэг»](../../assets/wpf/combobox-listbox/01_combobox_xaml.png)
+
+Таким образом, мой список будет выглядеть так.
+
+![Окно с выпадающим списком: Красный, Жёлтый, Синий, Зелёный](../../assets/wpf/combobox-listbox/02_combobox_dropdown.png)
+
+Через код нам необходимо создать какую-то коллекцию с элементами — массив или лист, а также дать имя комбобоксу, чтобы мы смогли привязать к нему список элементов. Дам ему имя `ColourCbx`. Предыдущие элементы в списке я удалю.
+
+![Свойство «Имя» в панели «Свойства»: ColourCbx, тип ComboBox](../../assets/wpf/combobox-listbox/03_combobox_name.png)
+
+Теперь, я прямо в главном конструкторе, создам лист со своими элементами и присвою его через `ItemsSource` — источник элементов. Запомните это свойство, оно вам по жизни еще понадобится.
+
+Заметьте, что присваиваю я после `InitializeComponent()`. Напоминаю, что если начать присваивать до этого метода, тогда мы схватим `NullPointException`, потому что сам интерфейс еще не был создан, и присваивать элементы некуда.
+
+![Конструктор MainWindow с подписью «присваиваю после этого метода» рядом с InitializeComponent и подчёркнутым ItemsSource](../../assets/wpf/combobox-listbox/04_itemssource_annotated.png)
+
+По итогу, с помощью двух простых строчек, мы присвоили элементы к списку. И теперь наш интерфейс выглядит вот так.
+
+![Запущенное приложение: выпадающий список с Красным, Синим, Зелёным, Оранжевым](../../assets/wpf/combobox-listbox/05_combobox_runtime.png)
+
+Элементы мы присвоили, а как найти нужный?
+
+## Выбранный элемент списка
+
+Всего мы можем взаимодействовать с выбранными элементами списка тремя способами — `SelectedIndex`, `SelectedItem` и `SelectedValue`. Последний нас пока не интересует, он будет нужен, когда отображаться будет один элемент, а само значение он будет хранить другое, например, отображается «Красный», а значение за ним «Red» (примерно, как с enum-ом). Давайте рассмотрим индекс и сам элемент.
+
+Во-первых, событие, обрабатывающее измененный элемент списка, называется `SelectionChanged`. Давайте обработаем его, и сначала выведем выбранный элемент с помощью индекса. Выводить выбранный элемент я буду в MessageBox.
+
+Чтобы вывести элемент с помощью `SelectedIndex`, нужно понимать, что все элементы — это некая коллекция. Называется она `Items` и обратиться к ней мы можем с помощью `НазваниеСписка.Items`. Чтобы отобразить элемент под выбранным индексом, необходимо написать `НазваниеСписка.Items[НазваниеСписка.SelectedIndex]`, т.е. все как в обычных коллекциях — обращение через индекс, но теперь наш индекс хранится внутри свойства `SelectedIndex`.
+
+Однако просто так у нас не получится вывести наш элемент, так как элемент может быть любого типа данных.
+
+![Подсказка компилятора CS0266: не удается неявно преобразовать тип «object» в «string»](../../assets/wpf/combobox-listbox/06_selectedindex_cs0266.png)
+
+Давайте используем приведение типов данных, и приведем выбранный элемент к типу данных `string`, а затем получившийся результат выведу в MessageBox.
+
+```csharp
+private void ColourCbx_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    string selected = ColourCbx.Items[ColourCbx.SelectedIndex] as string;
+    MessageBox.Show(selected);
+}
+```
+
+Работать будет следующим образом. В своем списке я выбираю какой-то пункт, например, синий.
+
+![Окно с выбранным «Синий» в выпадающем списке](../../assets/wpf/combobox-listbox/07_blue_selected.png)
+
+WPF понимает, что мы выбрали элемент под индексом 1, и отображает нам первый элемент.
+
+![Диалоговое окно с надписью «Синий»](../../assets/wpf/combobox-listbox/08_blue_messagebox.png)
+
+Тоже самое можно провернуть с помощью `SelectedItem`, только внутри этого свойства уже будет хранится не индекс, а сам элемент.
+
+```csharp
+private void ColourCbx_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    string selected = ColourCbx.SelectedItem as string;
+    MessageBox.Show(selected);
+}
+```
+
+Получившийся результат будет точно таким же.
+
+## ListBox
+
+Представим, что у меня есть какая-то коллекция с данными, которую я хочу вывести на экран. Как мне это сделать? С помощью ComboBox? Его каждый раз открывать надо. С помощью TextBlock? А что если я не знаю количество элементов в коллекции, или я буду его менять?
+
+Для этого у нас есть `ListBox` — контейнер для коллекций. Давайте смотреть как он работает.
+
+Работаем мы с ним примерно также, как и с ComboBox. Разница только в том, что ComboBox это выпадающий список, а ListBox — просто список, который мы видим всегда. Я создам один листбокс и дам ему имя.
+
+```xml
+<Grid>
+    <ListBox x:Name="ExampleLbx"/>
+</Grid>
+```
+
+Основные свойства у него такие же — `Items` и `ItemsSource`. Создать элементы мы можем как из XAML — используя `ListBoxItem`.
+
+![ListBox с тремя ListBoxItem (Первый/Второй/Третий) и подписью «элементы»](../../assets/wpf/combobox-listbox/09_listbox_items_arrow.png)
+
+(кстати, мы еще можем ставить сепараторы между элементами — некие разделительные полосы, чтобы выглядело красиво)
+
+![ListBox с разделителем-сепаратором между элементами](../../assets/wpf/combobox-listbox/10_listbox_separator.png)
+
+Так и через код, при помощи `ItemsSource`. Логика такая же, как и с выпадающими списками — создаем какую-то коллекцию, и присваиваем ее к `НазваниеЭлемента.ItemsSource`.
+
+```csharp
+public MainWindow()
+{
+    InitializeComponent();
+    string[] items = new string[] { "Первый", "Второй", "Третий" };
+    ExampleLbx.ItemsSource = items;
+}
+```
+
+![Запущенный ListBox со списком «Первый/Второй/Третий»](../../assets/wpf/combobox-listbox/11_listbox_simple.png)
+
+Выбранный элемент мы можем также взять с помощью двух свойств — `SelectedIndex` и `SelectedItem`. Событие по работе с измененным выбранным элементом такое же — `SelectionChanged`.
+
+![Свойства ExampleLbx с привязанным SelectionChanged=ExampleLbx_SelectionChanged](../../assets/wpf/combobox-listbox/12_listbox_selectionchanged.png)
+
+![Обработчик ExampleLbx_SelectionChanged с подписями «через элемент напрямую», «через все элементы и индекс», «результат я покажу в диалоговом окошке»](../../assets/wpf/combobox-listbox/13_handler_annotated.png)
+
+И по итогу мы сможем выводить все элементы и получить выбранный, чтобы в будущем с ним работать — показать его, записать в какую-то переменную, или построить с ним условие/цикл.
+
+![Окно с выбранным «Второй» и MessageBox с этим же текстом](../../assets/wpf/combobox-listbox/14_listbox_selected_msgbox.png)
+
+## Свой тип данных в списке
+
+Но это просто обычный массив с текстом, что делать, если я хочу отобразить свой тип данных в листбоксе или комбобоксе?
+
+Создам свой тип данных, например, с людьми — имя, фамилия, отчество. Создам внутри конструктор чтобы было удобнее заполнять данные.
+
+```csharp
+internal class Human
+{
+    public string FirstName;   // Фамилия
+    public string Name;        // Имя
+    public string Patronymic;  // Отчество
+
+    public Human(string firstName, string name, string patronymic)
+    {
+        FirstName = firstName;
+        Name = name;
+        Patronymic = patronymic;
+    }
+}
+```
+
+И создам коллекцию с тремя разными людьми. Заполню ее до `InitializeComponent`, чтобы до создания интерфейса все уже было готово.
+
+```csharp
+public partial class MainWindow : Window
+{
+    List<Human> humans = new List<Human>();
+
+    public MainWindow()
+    {
+        Human maks    = new Human("Макаров", "Максим",  "Матвеевич");
+        Human alexey  = new Human("Левин",   "Алексей", "Данильевич");
+        Human dmitriy = new Human("Семенов", "Дмитрий", "Елисеевич");
+
+        humans.Add(maks);
+        humans.Add(alexey);
+        humans.Add(dmitriy);
+
+        InitializeComponent();
+    }
+}
+```
+
+Раз мы создали коллекцию через код, то и через код нам нужно указать источник для листбокса — при помощи `ItemsSource`. Это пишем уже после `InitializeComponent`, чтобы интерфейс создался, и потом только мы что-то в нем настроили.
+
+```csharp
+InitializeComponent();
+ExampleLbx.ItemsSource = humans;
+```
+
+Запустим и увидим следующее. Вместо красивого отображения мы видим везде Human Human Human. Так происходит, потому что программа выводит сам элемент. Когда элемент коллекции был текстом, он и выводил текст. Когда элемент коллекции был числом, он выводил число. Когда элемент коллекции является классом, он и выводит, что это за класс. Ему никто не говорил, что надо вывести что-то внутри этого класса.
+
+![ListBox с тремя одинаковыми строками «тестыWPFFramework.Human»](../../assets/wpf/combobox-listbox/15_listbox_human_default.png)
+
+## DisplayMemberPath
+
+А мы можем ему это сказать — при помощи свойства `DisplayMemberPath` у листбокса или комбобокса. Но вывести мы сможем только какой-то один атрибут — только фамилию, имя, или отчество в нашем случае.
+
+`DisplayMemberPath` должен хранить в себе точное название атрибута, который мы хотим вывести. Хотим имя — пишем Name. Хотим фамилию — пишем FirstName и так далее.
+
+Задать этот DisplayMemberPath можно либо в XAML, либо в коде.
+
+![Класс Human с тремя строковыми полями и три варианта DisplayMemberPath в XAML: FirstName, Name, Patronymic](../../assets/wpf/combobox-listbox/16_displaymemberpath_xaml.png)
+
+```xml
+<ListBox x:Name="ExampleLbx" DisplayMemberPath="Patronymic"/>
+```
+
+![Класс Human рядом с кодом, где ExampleLbx.DisplayMemberPath последовательно ставится в «FirstName», «Name», «Patronymic»](../../assets/wpf/combobox-listbox/17_displaymemberpath_code.png)
+
+Если в наименовании `DisplayMemberPath` будет ошибка или он будет несовпадать с переменной, тогда ничего не отобразится. Если он совпадает с какой-то переменной, тогда вместо Human будет отображаться эта переменная. Например, я оставлю `Patronymic` для отображения.
+
+Запускаю и вижу, что ничего не отображается, хотя написано все верно. Почему?
+
+![Запущенное окно с пустым ListBox — никакой текст не отрисовался](../../assets/wpf/combobox-listbox/18_listbox_empty.png)
+
+## get; set; для отображения
+
+Более подробно мы разберем это на следующих парах, но сейчас кратко: если я хочу, чтобы интерфейс начал работать с переменными внутри класса, мне надо поставить всем переменным `{ get; set; }`, чтобы интерфейс их видел.
+
+Без гет-сета интерфейс пытается взять (`get`) какое-то значение из переменной, а у него нет `get`. Он и не берет, он не знает что брать.
+
+С гет-сетом интерфейс может взять (`get`) это значение и его отображить.
+
+Поменяю свой класс `Human`, добавив везде `get` и `set`. Заметьте, что точка с запятой тоже уходит, именно заместо нее ставятся `get` и `set`.
+
+![Класс Human со свойствами FirstName, Name, Patronymic — у каждого добавлено get; set;, подчёркивания на get и set](../../assets/wpf/combobox-listbox/19_human_getset.png)
+
+Перезапущу программу, оставив все как есть, только добавив гет-сеты.
+
+![ListBox с тремя отчествами: Матвеевич, Данильевич, Елисеевич](../../assets/wpf/combobox-listbox/20_listbox_patronymic.png)
+
+И все отображается! Тоже самое будет, если я изменю `DisplayMemberPath` на `FirstName` или `Name`.
+
+![ListBox с тремя фамилиями: Макаров, Левин, Семёнов](../../assets/wpf/combobox-listbox/21_listbox_firstname.png)
+
+![ListBox с тремя именами: Максим, Алексей, Дмитрий](../../assets/wpf/combobox-listbox/22_listbox_name.png)
+
+## Полный код примера
+
+`MainWindow.xaml` с одним ListBox и заданным DisplayMemberPath:
+
+```xml
+<Window x:Class="WpfApp2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="195" Width="243">
+    <Grid>
+        <ListBox x:Name="ExampleLbx" DisplayMemberPath="Patronymic"/>
+    </Grid>
+</Window>
+```
+
+`Human.cs` — класс со свойствами `get; set;`:
+
+```csharp
+namespace WpfApp2
+{
+    internal class Human
+    {
+        public string FirstName  { get; set; } // Фамилия
+        public string Name       { get; set; } // Имя
+        public string Patronymic { get; set; } // Отчество
+
+        public Human(string firstName, string name, string patronymic)
+        {
+            FirstName = firstName;
+            Name = name;
+            Patronymic = patronymic;
+        }
+    }
+}
+```
+
+`MainWindow.xaml.cs` — наполняем коллекцию и привязываем её к ListBox:
+
+```csharp
+using System.Collections.Generic;
+using System.Windows;
+
+namespace WpfApp2
+{
+    public partial class MainWindow : Window
+    {
+        List<Human> humans = new List<Human>();
+
+        public MainWindow()
+        {
+            Human maks    = new Human("Макаров", "Максим",  "Матвеевич");
+            Human alexey  = new Human("Левин",   "Алексей", "Данильевич");
+            Human dmitriy = new Human("Семенов", "Дмитрий", "Елисеевич");
+
+            humans.Add(maks);
+            humans.Add(alexey);
+            humans.Add(dmitriy);
+
+            InitializeComponent();
+
+            ExampleLbx.ItemsSource = humans;
+        }
+    }
+}
+```
