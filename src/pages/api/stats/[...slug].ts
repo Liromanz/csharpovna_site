@@ -23,7 +23,7 @@ export const GET: APIRoute = async ({ params }) => {
   return new Response(JSON.stringify({ slug, views, likes }), {
     headers: {
       "content-type": "application/json",
-      "cache-control": "public, max-age=60",
+      "cache-control": "no-store",
     },
   });
 };
