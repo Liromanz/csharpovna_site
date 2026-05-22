@@ -76,7 +76,7 @@ const { slug } = Astro.props;
         if (viewsEl && typeof data.views === "number") viewsEl.textContent = String(data.views);
       }
 
-      const statsRes = await fetch(`/api/stats/${encodeURIComponent(slug)}`);
+      const statsRes = await fetch(`/api/stats/${slug}`);
       if (statsRes.ok) {
         const data = await statsRes.json();
         if (viewsEl && typeof data.views === "number") viewsEl.textContent = String(data.views);
